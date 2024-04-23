@@ -1,6 +1,6 @@
 env: &env
   docker:
-    - image: cmssw/cmssw:CMSSW_9_3_2
+    - image: cmssw/cmssw:CMSSW_11_1_3
       environment:
         PATH: "/home/cmsbld/dos2unix-7.4.0/:/home/cmsbld/githack/:/home/cmsbld/CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         LIBRARY_PATH: "/home/cmsbld/boost_1_61_0/stage/lib"
