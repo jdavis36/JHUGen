@@ -63,15 +63,15 @@ jobs:
           at: ~/JHUGen
       - run:
           <<: *cmsrelcmsenv
-      - run:
-          name: "git checkout -B hack"
-          command: |
-            mkdir $HOME/githack &&
-            echo '#!/bin/bash
-                  cd ~/CMSSW_10_2_18 && eval $(scram ru -sh) && cd - > /dev/null &&
-                  git "$@"
-                 ' > $HOME/githack/git &&
-            chmod u+x $HOME/githack/git
+      #- run:
+      #    name: "git checkout -B hack"
+      #    command: |
+      #      mkdir $HOME/githack &&
+      #      echo '#!/bin/bash
+      #            cd ~/CMSSW_10_2_18 && eval $(scram ru -sh) && cd - > /dev/null &&
+      #            git "$@"
+      #           ' > $HOME/githack/git &&
+      #      chmod u+x $HOME/githack/git
       - run: 
           name: "update git???"
           command: |
