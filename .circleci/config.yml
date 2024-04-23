@@ -72,11 +72,11 @@ jobs:
       #            git "$@"
       #           ' > $HOME/githack/git &&
       #      chmod u+x $HOME/githack/git
-      - run: 
-          name: "update git???"
-          command: |
-            git --version
-            sudo apt-get install git
+      #- run: 
+      #    name: "update git???"
+      #    command: |
+      #      git --version
+      #      sudo apt-get install git
       - checkout
       - run:
           name: "undo git checkout -B hack"
