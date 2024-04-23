@@ -44,8 +44,8 @@ cmsrelcmsenv: &cmsrelcmsenv
     echo "source /opt/cms/cmsset_default.sh" >> $BASH_ENV
     source $BASH_ENV
     cd $HOME
-    scram p CMSSW CMSSW_9_3_2
-    echo 'cd ~/CMSSW_9_3_2 && eval $(scram ru -sh) && cd - > /dev/null' >> $BASH_ENV
+    scram p CMSSW CMSSW_11_1_3
+    echo 'cd ~/CMSSW_11_1_3 && eval $(scram ru -sh) && cd - > /dev/null' >> $BASH_ENV
 jhugenversion: &jhugenversion
   name: find JHUGen version
   command: |
@@ -68,7 +68,7 @@ jobs:
           command: |
             mkdir $HOME/githack &&
             echo '#!/bin/bash
-                  cd ~/CMSSW_9_3_2 && eval $(scram ru -sh) && cd - > /dev/null &&
+                  cd ~/CMSSW_11_1_3 && eval $(scram ru -sh) && cd - > /dev/null &&
                   git "$@"
                  ' > $HOME/githack/git &&
             chmod u+x $HOME/githack/git
