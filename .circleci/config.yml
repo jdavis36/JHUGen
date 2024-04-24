@@ -82,8 +82,8 @@ jobs:
       #    name: "undo git checkout -B hack"
       #    command: rm -r $HOME/githack
       #from https://gist.github.com/karlhorky/88b3c8c258796cd3eb97615da36e07be, handles submodule fetching for MELA PRs that have been squash merged
-      - run: git config --global remote."origin".fetch '+refs/pull/*/head:refs/remotes/origin/pr/*'
-      - run: git submodule update --init
+      #- run: git config --global remote."origin".fetch '+refs/pull/*/head:refs/remotes/origin/pr/*'
+      #- run: git submodule update --init
       - restore_cache:
           key: v2_boost_1_61_0
       - run:
