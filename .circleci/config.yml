@@ -45,7 +45,7 @@ cmsrelcmsenv: &cmsrelcmsenv
     source $BASH_ENV
     cd $HOME
     scram p CMSSW CMSSW_11_1_3
-    echo 'cd ~/CCMSSW_11_1_3 && eval $(scram ru -sh) && cd - > /dev/null' >> $BASH_ENV
+    echo 'cd ~/CMSSW_11_1_3 && eval $(scram ru -sh) && cd - > /dev/null' >> $BASH_ENV
 jhugenversion: &jhugenversion
   name: find JHUGen version
   command: |
