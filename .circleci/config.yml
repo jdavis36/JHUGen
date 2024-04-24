@@ -75,8 +75,7 @@ jobs:
       - run: 
           name: "Manual Checkout"
           command: |
-            git clone $CIRCLE_REPOSITORY_URL
-            yes
+            git clone https://github.com/JHUGen/JHUGen.git
             git pull origin pull/$CIRCLE_PR_NUMBER/head
       #- checkout
       #- run:
