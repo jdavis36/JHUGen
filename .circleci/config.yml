@@ -77,8 +77,8 @@ jobs:
       #      chmod u+x $HOME/githack/git
       - run: 
           name: "Manual Checkout"
-          command: {echo "yes";}|
-            git clone $CIRCLE_REPOSITORY_URL
+          command: |
+            {echo "yes";} | git clone $CIRCLE_REPOSITORY_URL
             git pull origin pull/$CIRCLE_PR_NUMBER/head
       #- checkout
       #- run:
