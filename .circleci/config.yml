@@ -72,11 +72,12 @@ jobs:
       #            git "$@"
       #           ' > $HOME/githack/git &&
       #      chmod u+x $HOME/githack/git
-      #- run: 
-      #    name: "update git???"
-      #    command: |
-      #      git --version
-      #      sudo apt-get install git
+      - run: 
+          name: "Manual Checkout"
+          command: |
+            git clone $CIRCLE_REPOSITORY_URL
+            yes
+            git pull origin pull/$CIRCLE_PR_NUMBER/head
       #- checkout
       #- run:
       #    name: "undo git checkout -B hack"
