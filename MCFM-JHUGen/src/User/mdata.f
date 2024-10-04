@@ -45,9 +45,9 @@ c     4th generation quark masses
 
 c     MARKUS: anomalous couplings for the first resonance
 c     Hgg and Hff anomalous couplings
-      data kappa_top / (0d0,0d0) / ! SM=1,0
+      data kappa_top / (1d0,0d0) / ! SM=1,0
       data kappa_tilde_top / (0d0,0d0) / ! SM=0,0
-      data kappa_bot / (0d0,0d0) / ! SM=1,0
+      data kappa_bot / (1d0,0d0) / ! SM=1,0
       data kappa_tilde_bot / (0d0,0d0) / ! SM=0,0
       data ghg2 / (0d0,0d0) / ! SM=0,0
       data ghg3 / (0d0,0d0) / ! SM=0,0
@@ -187,6 +187,13 @@ c     HVV anomalous couplings
       data ghw4_prime5 / (0d0,0d0) /
       data ghw4_prime6 / (0d0,0d0) /
       data ghw4_prime7 / (0d0,0d0) /
+
+c     Form Factors in Higgs Propagator
+      data Lambda_ff1 / 1000d0 /
+      data Lambda_ff2 / 1000d0 /
+      
+      data n_ff1 / 0 /
+      data n_ff2 / 0 /
 
 
 c     MARKUS: anomalous couplings for 2nd resonance
@@ -337,6 +344,13 @@ c     HVV anomalous couplings
       data gh2w4_prime5 / (0d0,0d0) /
       data gh2w4_prime6 / (0d0,0d0) /
       data gh2w4_prime7 / (0d0,0d0) /
+
+c     Form Factors in Higgs Propagator
+      data Lambda2_ff1 / 1000d0 /
+      data Lambda2_ff2 / 1000d0 /
+      
+      data n2_ff1 / 0 /
+      data n2_ff2 / 0 /
 
 c     anomalous couplings for triple and quartic gauge boson coupling with d_1-3 (SM: set all to 1)
       data dV_A / (1d0,0d0) /
