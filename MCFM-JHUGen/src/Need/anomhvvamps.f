@@ -975,6 +975,143 @@ c---  BSM amplitudes for decay proportional to momenta. See Appendix A of https:
       return
       end
 
+
+      subroutine anomhwwamp_c6(prop34,prop56,za,zb,
+     & H4l_c6_gmunu,H4l_c6_qmuqnu)
+           implicit none
+           include 'constants.f'
+           include 'masses.f'
+           include 'scale.f'
+           include 'zcouple.f'
+           include 'spinzerohiggs_anomcoupl.f'
+           include 'sprods_com.f'
+           include 'zprods_decl.f'
+           include 'ewcouple.f'
+           include 'qlfirst.f'
+           double complex H4l(2,2),prop34,prop56
+           double complex H4l_c6_gmunu(2,2),HWW_c6_gmunu
+           double complex H4l_c6_qmuqnu(2,2),HWW_c6_qmuqnu
+           double precision mb2,mt2,sinthw
+           double precision qhsq, q1sq, q2sq, MH2, MW2, dB0h, dZh, Z
+           double precision sqrts 
+           double complex qlI2,qlI3,C0mt
+     
+c--- SM H4l amplitude 
+c--- Possible in the future to modify AnomHWW
+           MH2  = hmass**2
+           MW2  = wmass**2
+           sinthw=sqrt(xw)
+     
+c--- SM Amplitudes for decay
+           H4l(1,1)=za(3,5)*zb(4,6)*l1*l2
+     &        *wmass/(sinthw*(1d0-xw))*prop34*prop56
+           H4l(2,1)=za(4,5)*zb(3,6)*r1*l2
+     &        *wmass/(sinthw*(1d0-xw))*prop34*prop56
+           H4l(1,2)=za(3,6)*zb(4,5)*l1*r2
+     &        *wmass/(sinthw*(1d0-xw))*prop34*prop56
+           H4l(2,2)=za(4,6)*zb(3,5)*r1*r2
+     &        *wmass/(sinthw*(1d0-xw))*prop34*prop56
+     
+c--- c6 correction to HWW vertex
+     
+           if (qlfirst) then
+           qlfirst=.false.
+           call qlinit 
+           endif
+     
+           qhsq = s(1,2)
+           q1sq = s(3,4)
+           q2sq = s(5,6)
+     
+           dB0h = (-9 + 2*Sqrt(3.)*Pi)/(9.*MH2)
+           dZh  = -w2_c6*dB0h 
+     
+c--- SM part of HWW vertex
+     
+           HWW_c6_gmunu = (9*(2.d0 + c6)*dZh*MH2)/2.d0
+     
+           HWW_c6_gmunu = HWW_c6_gmunu +
+     &  3 + ((3*(MH2 - MW2 + q1sq)*(q1sq - q2sq) + 
+     &  3*(MH2 - MW2 - q1sq)*qhsq)*qlI2(q1sq,MH2,MW2,1D0,0))/
+     &   (q1sq**2 + (q2sq - qhsq)**2 - 2*q1sq*(q2sq + qhsq)) + 
+     &  ((-3*(q1sq - q2sq)*(MH2 - MW2 + q2sq) - 
+     &  3*(-MH2 + MW2 + q2sq)*qhsq)*qlI2(q2sq,MH2,MW2,1D0,0))/
+     &   (q1sq**2 + (q2sq - qhsq)**2 - 2*q1sq*(q2sq + qhsq)) + 
+     &  ((-3*(q1sq - q2sq)**2 + 3*(-2*MH2 + 2*MW2 + q1sq + q2sq)*qhsq)*
+     &     qlI2(qhsq,MH2,MH2,1D0,0))/
+     &   (q1sq**2 + (q2sq - qhsq)**2 - 2*q1sq*(q2sq + qhsq)) + 
+     &  ((6*(MH2 - 2*MW2)*(q1sq - q2sq)**2 + 
+     &       6*(MH2**2 + MW2**2 + q1sq*q2sq + 3*MW2*(q1sq + q2sq) - 
+     &          MH2*(2*MW2 + q1sq + q2sq))*qhsq - 6*MW2*qhsq**2)*
+     &     qlI3(qhsq,q1sq,q2sq,MH2,MH2,MW2,1D0,0))/
+     &     (q1sq**2 + (q2sq - qhsq)**2 - 2*q1sq*(q2sq + qhsq))
+     
+           HWW_c6_gmunu = (c6*MH2)/(32.d0*Pi**2*vevsq)*HWW_c6_gmunu
+     
+c---  BSM amplitudes for decay proportional to metric
+           
+           H4l_c6_gmunu(1,1)= H4l(1,1)*HWW_c6_gmunu
+           H4l_c6_gmunu(2,1)= H4l(2,1)*HWW_c6_gmunu
+           H4l_c6_gmunu(1,2)= H4l(1,2)*HWW_c6_gmunu
+           H4l_c6_gmunu(2,2)= H4l(2,2)*HWW_c6_gmunu
+     
+           
+c--- Non-SM part of HWW vertex         
+     
+           HWW_c6_qmuqnu = (6*(q1sq + q2sq - qhsq))/
+     &   (q1sq**2 + (q2sq - qhsq)**2 - 2*q1sq*(q2sq + qhsq)) - 
+     &  (12*MH2*(1 - Log(MH2)))/
+     &   (q1sq**2 + (q2sq - qhsq)**2 - 2*q1sq*(q2sq + qhsq)) + 
+     &  (12*MW2*(1 - Log(MW2)))/
+     &   (q1sq**2 + (q2sq - qhsq)**2 - 2*q1sq*(q2sq + qhsq)) + 
+     &  (6*((q1sq - q2sq)*(q1sq*(5*MH2 - 5*MW2 + q1sq) + 
+     &          (MH2 - MW2 + 5*q1sq)*q2sq) - 
+     &  2*(q1sq*(2*MH2 - 2*MW2 + q1sq) + (-MH2 + MW2 - 2*q1sq)*q2sq)*
+     &  qhsq + (-MH2 + MW2 + q1sq)*qhsq**2)*qlI2(q1sq,MH2,MW2,1d0,0))/
+     &   (q1sq**2 + (q2sq - qhsq)**2 - 2*q1sq*(q2sq + qhsq))**2 + 
+     &  ((-6*(q1sq - q2sq)*((MH2 - MW2)*q1sq 
+     &  + 5*(MH2 - MW2 + q1sq)*q2sq + 
+     &          q2sq**2) + 12*(-(MW2*q1sq) + MH2*(q1sq - 2*q2sq) + 
+     &          2*(MW2 + q1sq)*q2sq - q2sq**2)*qhsq + 
+     &       6*(-MH2 + MW2 + q2sq)*qhsq**2)*qlI2(q2sq,MH2,MW2,1d0,0))/
+     &   (q1sq**2 + (q2sq - qhsq)**2 - 2*q1sq*(q2sq + qhsq))**2 + 
+     &  ((-6*(q1sq - q2sq)**2*(2*MH2 - 2*MW2 + q1sq + q2sq) + 
+     &       12*(q1sq**2 - 4*q1sq*q2sq + q2sq**2 - MH2*(q1sq + q2sq) + 
+     &          MW2*(q1sq + q2sq))*qhsq - 
+     &          6*(-4*MH2 + 4*MW2 + q1sq + q2sq)*
+     &    qhsq**2)*qlI2(qhsq,MH2,MH2,1d0,0))
+     &    /(q1sq**2 + (q2sq - qhsq)**2 - 2*q1sq*(q2sq + qhsq))**2 + 
+     &  (12*((q1sq - q2sq)**2*(MH2**2 + (MW2 - q1sq)*(MW2 - q2sq) + 
+     &          2*MH2*(-MW2 + q1sq + q2sq)) + 
+     &       (q1sq*(MH2**2 + MW2*(MW2 + q1sq) - 2*MH2*(MW2 + 2*q1sq)) + 
+     &    ((MH2 - MW2)**2 + 4*MH2*q1sq - 6*MW2*q1sq + q1sq**2)*q2sq + 
+     &          (-4*MH2 + MW2 + q1sq)*q2sq**2)*qhsq + 
+     &    (-2*MH2**2 - 2*MW2**2 - 2*q1sq*q2sq + MW2*(q1sq + q2sq) + 
+     &          2*MH2*(2*MW2 + q1sq + q2sq))*qhsq**2 - MW2*qhsq**3)*
+     &     qlI3(qhsq,q1sq,q2sq,MH2,MH2,MW2,1d0,0))/
+     &   (q1sq**2 + (q2sq - qhsq)**2 - 2*q1sq*(q2sq + qhsq))**2
+     
+           HWW_c6_qmuqnu = (c6*MH2)/(32.d0*Pi**2*vevsq)*HWW_c6_qmuqnu
+     
+c---  BSM amplitudes for decay proportional to momenta. See Appendix A of https://arxiv.org/pdf/1902.04756.pdf
+           
+           H4l_c6_qmuqnu(1,1)=-(za(3,5)*zb(4,5)+za(3,6)*zb(4,6))
+     &        *(za(3,5)*zb(3,6)+za(4,5)*zb(4,6))*l1*l2
+     &        *wmass/(sinthw*(1d0-xw))*prop34*prop56*HWW_c6_qmuqnu   
+           H4l_c6_qmuqnu(2,1)=-(za(4,5)*zb(3,5)+za(4,6)*zb(3,6))
+     &        *(za(3,5)*zb(3,6)+za(4,5)*zb(4,6))*r1*l2
+     &        *wmass/(sinthw*(1d0-xw))*prop34*prop56*HWW_c6_qmuqnu    
+           H4l_c6_qmuqnu(1,2)=-(za(3,5)*zb(4,5)+za(3,6)*zb(4,6))
+     &        *(za(3,6)*zb(3,5)+za(4,6)*zb(4,5))*l1*r2
+     &        *wmass/(sinthw*(1d0-xw))*prop34*prop56*HWW_c6_qmuqnu         
+           H4l_c6_qmuqnu(2,2)=-(za(4,5)*zb(3,5)+za(4,6)*zb(3,6))
+     &        *(za(3,6)*zb(3,5)+za(4,6)*zb(4,5))*r1*r2
+     &        *wmass/(sinthw*(1d0-xw))*prop34*prop56*HWW_c6_qmuqnu      
+     
+     
+      return
+      end
+
       subroutine SMggHmtvertex(za,zb,ggHmt)
       implicit none
       include 'masses.f'

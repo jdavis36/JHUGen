@@ -11,10 +11,15 @@
 !      include 'first.f'
       include 'WWbits.f'
       include 'spinzerohiggs_anomcoupl.f'
+      integer AllowAnomTriLinear, wfn
+      double precision wf(11)
+      double precision dB0h, dZh
+      double precision MH2
       double precision s34,s56,s17,s28,s3456,t3,t4,
      & xl1,xr1,xq1,xl2,xr2,xq2
       double complex WWZZamp(2,2),ggWW(2,2),propX3456,
      & prop34,prop56,propw17,propw28,propWBF,prop3456,propz3456,
+     & prop3456_c6,
      & zab2,zba2,srWW(2,2),rxw,
      & sqzmass,Amp_S_DK,Amp_S_PR,facHiggs,srL,srR,
      & srgmWW34(2,2),srgmWW56(2,2),srZWW34(2,2),srZWW56(2,2)
@@ -27,6 +32,9 @@
       double complex AA3456(2,2)
       double complex anomhzzamp,anomhzaamp,anomhaaamp,anomhwwamp
       double complex srL_anom,srR_anom
+      double complex sigmah,hwidth_c6,width_c6
+      double complex HZZ_c6_gmunu(2,2), HZZ_c6_qmuqnu(2,2)
+      double complex HWW_c6_gmunu(2,2), HWW_c6_qmuqnu(2,2)
 !$omp threadprivate(ZZ3456)
       t4(i1,i2,i3,i4)=
      & +s(i1,i2)+s(i1,i3)+s(i1,i4)
@@ -69,7 +77,6 @@ c--- special fix for Madgraph check
 !      facHiggs = 2d0*sqzmass/cxw**2
       ! Multiply by 1=(4d0*cwmass2/vevsq*cxw/esq)
       facHiggs = 2d0*sqzmass*cxw**(-2)*(4d0*cwmass2/vevsq*cxw/esq)
-
 C---setting up couplings dependent on whether we are doing 34-line or 56-line
       if ((n3+n4 == 7) .or. (n3+n4 == 9)) then
       xl1=l1
@@ -123,6 +130,41 @@ c--- Jeff: Apply Form Factors regardless of width scheme
      &  (1d0+abs(s3456)/(Lambda_ff1**2))**n_ff1 * 
      &  (1d0+abs(s3456)/(Lambda_ff2**2))**n_ff2
       endif
+
+c--- Jeff: Allocate the anomalous c6 contributions 
+      HZZ_c6_gmunu(:,:)=czip
+      HZZ_c6_qmuqnu(:,:)=czip
+      HWW_c6_gmunu(:,:)=czip
+      HWW_c6_qmuqnu(:,:)=czip
+c--- Check if any wavefunctions are non zero
+      wf = (/ t1_c6,t2_c6,t3_c6,t4_c6,t5_c6,t6_c6,
+     & w1_c6,w2_c6,w3_c6,w4_c6,w5_c6 /)
+      do wfn = 1, size(wf)
+        if(wf(wfn) .ne. 0) then 
+          AllowAnomTriLinear = 1
+        endif
+      end do
+
+      if(AllowAnomTriLinear .eq. 1)then
+        call anomhzzamp_c6(prop34,prop56,za,zb,
+     & HZZ_c6_gmunu,HZZ_c6_qmuqnu)
+        call anomhwwamp_c6(propw17,propw28,za,zb,
+     & HWW_c6_gmunu,HWW_c6_qmuqnu)
+c--- propagator corrections
+c--- Note that the prop are defined at 1/prop in the rest of the code
+        prop3456_c6=-1d0/dcmplx(s3456-hmass**2,hmass*hwidth)
+     & *(sigmah(s(1,2),c6,w1_c6))
+c--- Keep the form of the propagator consistent with the others
+        prop3456_c6 = 1d0/prop3456_c6
+c--- for width corrections due to c6 operator
+        MH2 = hmass**2
+        dB0h = (-9 + 2*Sqrt(3.)*Pi)/(9.*MH2)
+        dZh = (-9*c6*(2.d0 + c6)*dB0h*MH2**2)/(32.d0*Pi**2*vevsq)
+        hwidth_c6 = 0.0023*c6*hwidth
+        width_c6 = im*hmass*(t5_c6*w4_c6*dZh*hwidth
+     & - t6_c6*(w5_c6*dZh/2.d0*hwidth + hwidth_c6))*(1d0/prop3456)
+      endif
+
       propWBF=propw17*propw28*prop34*prop56
 
       propX3456=dcmplx(s3456-h2mass**2,h2mass*h2width)
@@ -294,7 +336,27 @@ C-- MARKUS: this is the old (original) MCFM code
            endif
       WWZZamp(h34,h56)=WWZZamp(h34,h56)
      & -facHiggs*Amp_S_DK*Amp_S_PR/prop3456*Hbit
-         endif
+c--- Assemble the c6 corrections
+c----------------------------------------------------
+c------- This setup is only valid for SM HZZ -------- 
+c----------------------------------------------------
+c--- WWH production correction
+     & -facHiggs*Amp_S_DK*
+c--- &  za(i7,i8)*zb(i2,i1)/(propw17*propw28)
+     & *((t2_c6*HWW_c6_gmunu(h34,h56)+t3_c6*HWW_c6_qmuqnu(h34,h56))
+     & *Sqrt(cxw)*(1-cxw)/Sqrt(cwmass2))
+     & /prop3456*Hbit
+c--- HZZ decay correction
+     & -facHiggs*Amp_S_PR*
+c--- & za(i3,i5)*zb(i6,i4)/(prop34*prop56)*ZZ3456(h34,h56)*
+     & (t2_c6*HZZ_c6_gmunu(h34,h56)+t3_c6*HZZ_c6_qmuqnu(h34,h56))
+     & *Sqrt(cxw)*(1-cxw)/Sqrt(cwmass2)
+     & /prop3456*Hbit
+c--- Propagator correction
+     & -facHiggs*Amp_S_DK*Amp_S_PR*prop3456/prop3456_c6*Hbit
+c--- width correction 
+     & -facHiggs*Amp_S_DK*Amp_S_PR/prop3456*Hbit*width_c6
+      endif
 
 C----Second resonance
          Amp_S_PR=czip

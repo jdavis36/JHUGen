@@ -288,9 +288,12 @@ C-- MARKUS: this is the old (original) MCFM code
      & +fac*(
 C---s-channel
      & Amp_S_DK*Amp_S_PR/prop3456
+! Insert c6 corrections into s-channel amplitude 
 C---t-channel
+! Insert c6 corrections into t-channel amplitude 
      & +Amp_T_DK*Amp_T_PR/prop1734
 C---u-channel
+! Insert c6 corrections into u-channel amplitude 
      & +Amp_U_DK*Amp_U_PR/prop1756
      & )
 
