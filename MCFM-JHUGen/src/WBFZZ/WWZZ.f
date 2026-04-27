@@ -129,7 +129,7 @@ c--- Jeff: Apply Form Factors regardless of width scheme
      &  (1d0+abs(s3456)/(Lambda_ff1**2))**n_ff1 * 
      &  (1d0+abs(s3456)/(Lambda_ff2**2))**n_ff2
 
-        prop12_c6=-higgsprop(s(1,2))*(sigmah(s(1,2),c6,w1_c6))
+        prop12_c6=-higgsprop(s3456)*(sigmah(s3456,c6,w1_c6))
       endif
       propWBF=propw17*propw28*prop34*prop56
 
@@ -332,10 +332,10 @@ C-- MARKUS: this is the old (original) MCFM code
 
       Amp_S_DK_SM=za(i3,i5)*zb(i6,i4)/(prop34*prop56)*ZZ3456(h34,h56)
 
-      Amp_PROP_c6=-facHiggs*Amp_S_PR_SM*Amp_S_DK_SM/propz3456*Hbit
+      Amp_PROP_c6=-facHiggs*Amp_S_PR_SM*Amp_S_DK_SM/prop3456*Hbit
      & *t1_c6*(prop12_c6/prop12)
 
-      Amp_WIDTH_c6=-facHiggs*Amp_S_PR_SM*Amp_S_DK_SM/propz3456*Hbit
+      Amp_WIDTH_c6=-facHiggs*Amp_S_PR_SM*Amp_S_DK_SM/prop3456*Hbit
      & *width_c6
 
       WWZZamp(h34,h56)=WWZZamp(h34,h56)
