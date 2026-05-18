@@ -12,11 +12,13 @@
       include 'WWbits.f'
       include 'spinzerohiggs_anomcoupl.f'
       double precision s34,s56,s17,s28,s3456,t3,t4,
-     & xl1,xr1,xq1,xl2,xr2,xq2
-      double complex WWZZamp(2,2),ggWW(2,2),propX3456,
+     & xl1,xr1,xq1,xl2,xr2,xq2,sinthw,dB0h,dZh,MH2
+      double complex WWZZamp(2,2),ggWW(2,2),propX3456,prop12,prop12_c6,
      & prop34,prop56,propw17,propw28,propWBF,prop3456,propz3456,
-     & zab2,zba2,srWW(2,2),rxw,
-     & sqzmass,Amp_S_DK,Amp_S_PR,facHiggs,srL,srR,
+     & zab2,zba2,srWW(2,2),rxw,higgsprop,sigmah,
+     & sqzmass,Amp_S_DK,Amp_S_DK_SM,Amp_S_DK_c6,Amp_S_PR,Amp_S_PR_SM,
+     & Amp_S_PR_c6,Amp_PROP_c6, Amp_WIDTH_c6,hwidth_c6, width_c6,
+     & facHiggs,srL,srR,
      & srgmWW34(2,2),srgmWW56(2,2),srZWW34(2,2),srZWW56(2,2)
 !      & ,srggWW34(2,2),srggWW56(2,2)
       integer h34,h56,i1,i2,i3,i4,i5,i6,i7,i8,
@@ -26,6 +28,8 @@
       double complex AZ3456(2,2)
       double complex AA3456(2,2)
       double complex anomhzzamp,anomhzaamp,anomhaaamp,anomhwwamp
+      double complex anomhzzamp_c6_g1,anomhzzamp_c6_g2
+      double complex anomhwwamp_c6_g1,anomhwwamp_c6_g2
       double complex srL_anom,srR_anom
 !$omp threadprivate(ZZ3456)
       t4(i1,i2,i3,i4)=
@@ -60,6 +64,7 @@
      & *za(i7,i8)*zb(i2,i1)*zb(i3,i6))/t3(i3,i5,i6)
 C---end statement functions
 
+      sinthw=sqrt(xw)
 c--- special fix for Madgraph check
 !      if (index(runstring,'mad') .gt. 0) then
 !       sqzmass=dcmplx(zmass**2,0d0)
@@ -117,11 +122,14 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       propw28=dcmplx(s28-wmass**2,wmass*wwidth)
       propz3456=dcmplx(s3456-zmass**2,zmass*zwidth)
       prop3456=dcmplx(s3456-hmass**2,hmass*hwidth)
+      prop12=1d0/prop3456
 c--- Jeff: Apply Form Factors regardless of width scheme
       if (AllowAnomalousCouplings .eq. 1) then
         prop3456 = prop3456 * 
      &  (1d0+abs(s3456)/(Lambda_ff1**2))**n_ff1 * 
      &  (1d0+abs(s3456)/(Lambda_ff2**2))**n_ff2
+
+        prop12_c6=-higgsprop(s3456)*(sigmah(s3456,c6,w1_c6))
       endif
       propWBF=propw17*propw28*prop34*prop56
 
@@ -132,7 +140,13 @@ c      ggWW(1,2)=dcmplx(q1**2/(s34*s56))+dcmplx(rxw*l1*r1)/prop34/prop56
 c      ggWW(2,1)=dcmplx(q1**2/(s34*s56))+dcmplx(rxw*r1*l1)/prop34/prop56
 c      ggWW(2,2)=dcmplx(q1**2/(s34*s56))+dcmplx(rxw*r1**2)/prop34/prop56
 
-
+c--- Toni: for width corrections due to c6 operator
+        MH2 = hmass**2
+        dB0h = (-9 + 2*Sqrt(3.)*Pi)/(9.*MH2)
+        dZh = (-9*c6*(2.d0 + c6)*dB0h*MH2**2)/(32.d0*Pi**2*vevsq)
+        hwidth_c6 = 0.0023*c6*hwidth
+        width_c6 = im*hmass*(t6_c6*w4_c6*dZh*hwidth -
+     &  t7_c6*(w5_c6*dZh/2.d0*hwidth + hwidth_c6))*prop12
 
 c--- Make sure WWZA vertices included
 !       ggWW(1,1)=(dcmplx(xq1/s34)+rxw*dcmplx(xl1)/prop34)
@@ -272,13 +286,28 @@ C-- MARKUS: this is the old (original) MCFM code
 
          Amp_S_PR=czip
          Amp_S_DK=czip
+         Amp_S_DK_SM=czip
+         Amp_S_PR_SM=czip
+         Amp_S_DK_c6=czip
+         Amp_S_PR_c6=czip
          if( hmass.ge.zip .and. channeltoggle_stu.ne.1 ) then
            if( AnomalCouplPR.eq.1 ) then
       Amp_S_PR=-anomhwwamp(i7,i1,i8,i2,1,s3456,s(i7,i1),s(i8,i2),za,zb)
      &         /(propw17*propw28)
+
+      Amp_S_PR_c6=
+     & (-t4_c6
+     & *anomhwwamp_c6_g1(i7,i1,i8,i2,s3456,s(i7,i1),s(i8,i2),za,zb)
+     & -t5_c6
+     & *anomhwwamp_c6_g2(i7,i1,i8,i2,s3456,s(i7,i1),s(i8,i2),za,zb))
+     & /(propw17*propw28)/wmass*(sinthw*(1d0-xw))
+      !(1d0/(2*wmass*sqrt(xw)))
            else
       Amp_S_PR=za(i7,i8)*zb(i2,i1)/(propw17*propw28)
            endif
+
+      Amp_S_PR_SM=za(i7,i8)*zb(i2,i1)/(propw17*propw28)
+
            if( AnomalCouplDK.eq.1 ) then
       Amp_S_DK=
      & -anomhzzamp(i3,i4,i5,i6,1,s3456,s(i3,i4),s(i5,i6),za,zb)
@@ -289,11 +318,48 @@ C-- MARKUS: this is the old (original) MCFM code
      & /(s(i3,i4)*prop56)*AZ3456(h34,h56)
      & -anomhaaamp(i3,i4,i5,i6,1,s3456,s(i3,i4),s(i5,i6),za,zb)
      & /(s(i3,i4)*s(i5,i6))*AA3456(h34,h56)
+
+      Amp_S_DK_c6=
+     & (-t2_c6
+     & *anomhzzamp_c6_g1(i3,i4,i5,i6,s3456,s(i3,i4),s(i5,i6),za,zb)
+     & -t3_c6
+     & *anomhzzamp_c6_g2(i3,i4,i5,i6,s3456,s(i3,i4),s(i5,i6),za,zb))
+     & /(prop34*prop56)*ZZ3456(h34,h56)/wmass*(sinthw*(1d0-xw))
+      !(1d0/(2*wmass*sqrt(xw)))
            else
       Amp_S_DK=za(i3,i5)*zb(i6,i4)/(prop34*prop56)*ZZ3456(h34,h56)
            endif
+
+      Amp_S_DK_SM=za(i3,i5)*zb(i6,i4)/(prop34*prop56)*ZZ3456(h34,h56)
+
+      Amp_PROP_c6=-facHiggs*Amp_S_PR_SM*Amp_S_DK_SM/prop3456*Hbit
+     & *t1_c6*(prop12_c6/prop12)
+
+      Amp_WIDTH_c6=-facHiggs*Amp_S_PR_SM*Amp_S_DK_SM/prop3456*Hbit
+     & *width_c6
+
       WWZZamp(h34,h56)=WWZZamp(h34,h56)
      & -facHiggs*Amp_S_DK*Amp_S_PR/prop3456*Hbit
+     & -facHiggs*Amp_S_DK_c6*Amp_S_PR_SM/prop3456*Hbit
+     & -facHiggs*Amp_S_DK_SM*Amp_S_PR_c6/prop3456*Hbit
+     & +Amp_PROP_c6+Amp_WIDTH_c6
+
+      ! >>> Inserted printout here <<<
+C       print *, 'Amp_S_DK = ', Amp_S_DK
+C       print *, 'Amp_S_DK_c6 = ', Amp_S_DK_c6
+C       print *, 'Amp_S_PR = ', Amp_S_PR
+C       print *, 'Amp_S_PR_c6 = ', Amp_S_PR_c6
+C       print *, 'prop12 = ', prop12 
+C       print *, 'prop12_c6 = ', prop12_c6
+C       print *, "Amp_PROP_c6=", Amp_PROP_c6
+C       print *, "width_c6=", width_c6
+C       print *, "Amp_WIDTH_c6=", Amp_WIDTH_c6
+C       print *, 'SM = ', -facHiggs*(za(i3,i5)*zb(i6,i4)/(prop34*prop56)
+C      & *ZZ3456(h34,h56))
+C      & *(za(i7,i8)*zb(i2,i1)/(propw17*propw28))/propz3456*Hbit   
+C       print *, 'WWZZamp(h34,h56) = ', WWZZamp(h34,h56)
+C       stop
+      
          endif
 
 C----Second resonance
@@ -324,7 +390,6 @@ C----Second resonance
          endif
         enddo
       enddo
-
 
 C----Background contribution
 
@@ -722,8 +787,3 @@ C----Background contribution
 
       return
       end
-
-
-
-
-

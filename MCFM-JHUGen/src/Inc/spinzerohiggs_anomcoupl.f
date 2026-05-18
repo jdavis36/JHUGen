@@ -26,7 +26,7 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
       integer n2_ff1,n2_ff2
 
       double precision c6
-      double precision t1_c6,t2_c6,t3_c6,t4_c6,t5_c6,t6_c6
+      double precision t1_c6,t2_c6,t3_c6,t4_c6,t5_c6,t6_c6,t7_c6
       double precision w1_c6,w2_c6,w3_c6,w4_c6,w5_c6
 
       double precision mb_4gen,mt_4gen
@@ -136,7 +136,7 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
      & n_ff1,n_ff2,
      & n2_ff1,n2_ff2,
      & c6,
-     & t1_c6,t2_c6,t3_c6,t4_c6,t5_c6,t6_c6,
+     & t1_c6,t2_c6,t3_c6,t4_c6,t5_c6,t6_c6,t7_c6,
      & w1_c6,w2_c6,w3_c6,w4_c6,w5_c6,
 
 

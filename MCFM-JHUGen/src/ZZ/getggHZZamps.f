@@ -29,7 +29,7 @@ c---
       include 'qlfirst.f'
       integer h1,h34,h56
       integer AllowAnomTriLinear, wfn
-      double precision wf(11)
+      double precision wf(12)
       double precision p(mxpart,4),mb2,mt2,mtX2,mbX2
       double precision MH2
       double precision dB0h, dZh
@@ -42,6 +42,7 @@ c---
      & H4l_c6_gmunu(2,2), H4l_c6_qmuqnu(2,2)
       double precision rescale
       double complex anomhzzamp,anomhzaamp,anomhaaamp
+      double complex anomhzzamp_c6_g1,anomhzzamp_c6_g2
 
 !==== for width studies rescale by appropriate factor
       if((keep_smhiggs_norm).and.(anom_higgs)) then
@@ -89,7 +90,7 @@ c--- Amplitudes for production
 
 
 c--- Check if any wavefunctions are non zero
-      wf = (/ t1_c6,t2_c6,t3_c6,t4_c6,t5_c6,t6_c6,
+      wf = (/ t1_c6,t2_c6,t3_c6,t4_c6,t5_c6,t6_c6,t7_c6,
      & w1_c6,w2_c6,w3_c6,w4_c6,w5_c6 /)
       do wfn = 1, size(wf)
         if(wf(wfn) .ne. 0) then 
@@ -106,14 +107,11 @@ c--- for width corrections due to c6 operator
         dB0h = (-9 + 2*Sqrt(3.)*Pi)/(9.*MH2)
         dZh = (-9*c6*(2.d0 + c6)*dB0h*MH2**2)/(32.d0*Pi**2*vevsq)
         hwidth_c6 = 0.0023*c6*hwidth
-        width_c6 = im*hmass*(t5_c6*w4_c6*dZh*hwidth -
-     &  t6_c6*(w5_c6*dZh/2.d0*hwidth + hwidth_c6))*prop12
+        width_c6 = im*hmass*(t6_c6*w4_c6*dZh*hwidth -
+     &  t7_c6*(w5_c6*dZh/2.d0*hwidth + hwidth_c6))*prop12
 
 c--- c6 production corrections
         call anomhggvtxamp_c6(za,zb,ggHmt_c6)
-c--- c6 decay correction
-        call anomhzzamp_c6(prop34,prop56,za,zb,
-     & H4l_c6_gmunu,H4l_c6_qmuqnu)
 
 c---  Load SM gghtloop and for c6 corrections
         call SMggHmtvertex(za,zb,ggHmt)
@@ -183,6 +181,33 @@ c--- Amplitudes for decay
      & +anomhzaamp(6,5,4,3,1,s(1,2),s(5,6),s(3,4),za,zb)*q1*r2*facHAZ
      & +anomhaaamp(4,3,6,5,1,s(1,2),s(3,4),s(5,6),za,zb)*q1*q2*facHAA
 
+c--- Amplitudes for c6 corrections for decay
+      H4l_c6_gmunu(1,1)=
+     &  anomhzzamp_c6_g1(3,4,5,6,s(1,2),s(3,4),s(5,6),za,zb)
+     &  *l1*l2*prop34*prop56
+      H4l_c6_gmunu(2,1)=
+     &  anomhzzamp_c6_g1(4,3,5,6,s(1,2),s(3,4),s(5,6),za,zb)
+     &  *r1*l2*prop34*prop56
+      H4l_c6_gmunu(1,2)=
+     &  anomhzzamp_c6_g1(3,4,6,5,s(1,2),s(3,4),s(5,6),za,zb)
+     &  *l1*r2*prop34*prop56
+      H4l_c6_gmunu(2,2)=
+     &  anomhzzamp_c6_g1(4,3,6,5,s(1,2),s(3,4),s(5,6),za,zb)
+     &  *r1*r2*prop34*prop56
+
+      H4l_c6_qmuqnu(1,1)=
+     &  anomhzzamp_c6_g2(3,4,5,6,s(1,2),s(3,4),s(5,6),za,zb)
+     &  *l1*l2*prop34*prop56
+      H4l_c6_qmuqnu(2,1)=
+     &  anomhzzamp_c6_g2(4,3,5,6,s(1,2),s(3,4),s(5,6),za,zb)
+     &  *r1*l2*prop34*prop56
+      H4l_c6_qmuqnu(1,2)=
+     &  anomhzzamp_c6_g2(3,4,6,5,s(1,2),s(3,4),s(5,6),za,zb)
+     &  *l1*r2*prop34*prop56
+      H4l_c6_qmuqnu(2,2)=
+     &  anomhzzamp_c6_g2(4,3,6,5,s(1,2),s(3,4),s(5,6),za,zb)
+     &  *r1*r2*prop34*prop56      
+
 c--- Assemble
       do h1=1,2
       do h34=1,2
@@ -200,7 +225,7 @@ c--- propagator correction
      &     H4lSM(h34,h56)*prop12_c6/prop12
 c--- production correction
       Mloop_c6_production(h1,h1,h34,h56) =
-     &     t4_c6*ggHmt_c6(h1,h1)* H4lSM(h34,h56)
+     &     ggHmt_c6(h1,h1)* H4lSM(h34,h56)
      &     * (2*wmass*sqrt(xw))
 c--- decay correction  
       Mloop_c6_decay(h1,h1,h34,h56)=im*ggHmt(h1,h1)*
@@ -209,6 +234,7 @@ c--- decay correction
 c---  width correction
       Mloop_c6_width(h1,h1,h34,h56)=ggHmt(h1,h1)*
      &     H4lSM(h34,h56)*width_c6
+
       enddo
       enddo
       enddo
