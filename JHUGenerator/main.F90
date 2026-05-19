@@ -408,12 +408,12 @@ integer :: NumArgs,NArg
 logical :: help, PrintVersion, PrintHeader, DryRun, success, SetLastArgument, interfSet, ignoreRunningWidthResonanceCheck
 logical :: SetRenScheme, SetMuRenMultiplier, SetFacScheme, SetMuFacMultiplier, SetSchemeBounds
 logical :: SetMReso, SetGaReso, SetMReso2, SetGaReso2, SetBreitWignerCutoff, Setm4l_max, Setm4l_min
-logical :: SetAnomalousSpin0gg, Setghg2, SetAnomalousSpin0VV, Setghz1
+logical :: SetAnomalousSpin0gg, Setghg2, SetAnomalousSpin0VV, Setghz1, SetfLSpin0VV, SetfPerpSpin0VV, SetfLSchemeSpin0VV
 logical :: SetZZcoupling, SetZZprimecoupling, SetZprimeZprimecoupling
 logical :: SetZgammacoupling, Setgammagammacoupling, SetZprimegammacoupling
 logical :: SetWWcoupling, SetWWprimecoupling, SetWprimeWprimecoupling
 logical :: SetAnomalousSpin1qq, Setspin1qqleft, Setspin1qqright, SetSpin1VV
-logical :: SetAnomalousSpin2gg, SetAnomalousSpin2qq, Setspin2qqleft, Setspin2qqright, SetSpin2VV
+logical :: SetAnomalousSpin2gg, SetAnomalousSpin2qq, Setspin2qqleft, Setspin2qqright, SetSpin2VV, SetfApmSchemeSpin2VV
 logical :: SetAnomalousHff, Setkappa
 logical :: SetAnomalousHffMCFM, SetAnomalousHffMCFM_mbot4gen, SetAnomalousHffMCFM_mtop4gen
 logical :: Setkappatop, Setkappabot, SetAnomalousSpin0gg4gen, Setkappa4gentop, Setkappa4genbot, Setkappa2top, Setkappa2bot, SetAnomalousSpin0Res2gg, Setkappa24gentop, Setkappa24genbot, SetAnomalousSpin0Res2gg4gen
@@ -431,6 +431,7 @@ logical :: SetCSmaxFile, SetVBFoffsh_run
 logical :: SetVegasVerbosity
 integer :: VegasVerbosity
 integer :: i
+real :: check_frac
 type(SaveValues) :: tosave, oldsavevalues
 
    help = .false.
@@ -474,6 +475,9 @@ type(SaveValues) :: tosave, oldsavevalues
    SetAnomalousSpin0gg=.false.
    Setghg2=.false.
    SetAnomalousSpin0VV=.false.
+   SetfLSpin0VV=.false.
+   SetfPerpSpin0VV=.false.
+   SetfLSchemeSpin0VV=.false.
    Setghz1=.false.
    SetZZcoupling=.false.
    SetZZprimecoupling=.false.
@@ -493,6 +497,7 @@ type(SaveValues) :: tosave, oldsavevalues
    Setspin2qqleft=.false.
    Setspin2qqright=.false.
    Setspin2VV=.false.
+   SetfApmSchemeSpin2VV=.false.
 
    SetAnomalousHff=.false.
    Setkappa=.false.
@@ -700,6 +705,9 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "ghz2", success, ghz2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
     call ReadCommandLineArgument(arg, "ghz3", success, ghz3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
     call ReadCommandLineArgument(arg, "ghz4", success, ghz4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "fL", success, fL, success2=SetfLSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "fPerp", success, fPerp, success2=SetfPerpSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "calc_fL", success, calc_fL, success2=SetfLSchemeSpin0VV, tosave=tosave)
 
     !spin 0 Zgamma couplings
     call ReadCommandLineArgument(arg, "ghzgs2", success, ghzgs2, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, checkdestchange=.true., tosave=tosave)
@@ -845,6 +853,7 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "b8", success, b8, success2=SetSpin2VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
     call ReadCommandLineArgument(arg, "b9", success, b9, success2=SetSpin2VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
     call ReadCommandLineArgument(arg, "b10", success, b10, success2=SetSpin2VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "calc_fAmp", success, calc_fAmp, success2=SetfApmSchemeSpin2VV, tosave=tosave)
 
     call ReadCommandLineArgument(arg, "bzgs1", success, bzgs1, success2=SetSpin2VV, success3=SetZgammacoupling, checkdestchange=.true., tosave=tosave)
     call ReadCommandLineArgument(arg, "bzgs2", success, bzgs2, success2=SetSpin2VV, success3=SetZgammacoupling, checkdestchange=.true., tosave=tosave)
@@ -1845,6 +1854,14 @@ type(SaveValues) :: tosave, oldsavevalues
       if( SetAnomalousSpin1qq .or. SetSpin1VV ) then
         call Error("There is no point setting spin 1 couplings for spin 2 production")
       endif
+      if (SetfLSpin0VV .or. SetfPerpSpin0VV .or. SetfLSchemeSpin0VV) then
+        call Error("fL, fperp, and calc_fL are for spin 0")
+      endif
+      if (SetfApmSchemeSpin2VV) then
+        if ((calc_fAmp.ne.-1) .and. (calc_fAmp.ne.1) .and. (calc_fAmp.ne.-11) .and. (calc_fAmp.ne.2)) then
+            call Error("calc_fAmp can only be -1 (spin 1- projection), 1 (spin 1+ projection), 2 (spin 2+ projection), or -11 (interference between spin 1+ and 1-)")
+        endif
+      endif
     else !spin 0
       if( SetAnomalousSpin1qq .or. SetSpin1VV ) then
         call Error("There is no point setting spin 1 couplings for spin 0 production")
@@ -1852,6 +1869,17 @@ type(SaveValues) :: tosave, oldsavevalues
       if( SetAnomalousSpin2gg .or. SetAnomalousSpin2qq .or. SetSpin2VV ) then
         call Error("There is no point setting spin 2 couplings for spin 0 production")
       endif
+      if (((SetfLSpin0VV .or. SetfPerpSpin0VV) .and. (.not. (SetfLSchemeSpin0VV))) .or. ((.not. (SetfLSpin0VV .or. SetfPerpSpin0VV)) .and. SetfLSchemeSpin0VV)) then
+        call Error("fL and calc_fL must be set at the same time")
+      endif
+      if (SetfApmSchemeSpin2VV) then
+        call Error("calc_fAmp is for spin2")
+      endif
+      check_frac = fL + fPerp
+      if (check_frac .gt. 1) then
+        call Error("fL + fPerp cannot be greater than 1!!!")
+      endif
+
     endif
 
     ! Spin-0 (incomplete)
