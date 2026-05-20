@@ -31,6 +31,18 @@ Command line parameters for quick reference:
                        114=t/tbar+H t/s channels
                        115=t+W+H, 116=tbar+W+H
                        117=t/tbar+W+H
+    Polarization:      fL = (-1, 1) fPerp = (-1, 1) 
+                       Polarization of spin 0 resonance. 
+                       When calc_fL=1, fL and fPerp can be real number from -1 to 1.
+                       When calc_fL=2, fL = 0 or 1, fPerp =0. 
+                       Need to set with calc_fL at the same time.
+                       calc_fL = 0, 1, 2
+                       calc_fAmp = -1, 1, 2, -11 
+                       Polarization of spin 2 resonance. 
+                       -1 is spin 1- projection. 
+                       1 is spin 1+ projection. 
+                       2 is spin 2+ projection. 
+                       -11 is interference between spin 1+ and spin 1-.
     DecayMode1:        decay mode for vector boson 1 (Z/W/gamma)
     DecayMode2:        decay mode for vector boson 2 (Z/W/gamma)
                          0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->2nu,
