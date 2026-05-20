@@ -1875,7 +1875,7 @@ type(SaveValues) :: tosave, oldsavevalues
       if (SetfApmSchemeSpin2VV) then
         call Error("calc_fAmp is for spin2")
       endif
-      if (SetfLSchemeSpin0VV .eq. 1) then
+      if (calc_fL .eq. 1) then
         check_frac = fL + fPerp
         if (check_frac .gt. 1) then
             call Error("fL + fPerp cannot be greater than 1!!!")
