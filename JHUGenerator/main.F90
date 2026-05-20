@@ -444,7 +444,7 @@ type(SaveValues) :: tosave, oldsavevalues
 #else
    PDFSet=1      ! 1: CTEQ6L1   2: MRSW with best fit, 2xx: MSTW with eigenvector set xx=01..40
 #endif
-
+   check_frac = 0
    WidthScheme=-1
    WidthSchemeIn=-1
    ignoreRunningWidthResonanceCheck = .false.   !If WidthScheme=4, this setting will ignore the pole mass check. Use at your own risk!
@@ -1875,11 +1875,12 @@ type(SaveValues) :: tosave, oldsavevalues
       if (SetfApmSchemeSpin2VV) then
         call Error("calc_fAmp is for spin2")
       endif
-      check_frac = fL + fPerp
-      if (check_frac .gt. 1) then
-        call Error("fL + fPerp cannot be greater than 1!!!")
+      if (SetfLSchemeSpin0VV .eq. 1) then
+        check_frac = fL + fPerp
+        if (check_frac .gt. 1) then
+            call Error("fL + fPerp cannot be greater than 1!!!")
+        endif
       endif
-
     endif
 
     ! Spin-0 (incomplete)
@@ -6351,6 +6352,8 @@ character :: arg*(1000)
                if( cdabs(ghz2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghz2=",ghz2,"i"
                if( cdabs(ghz3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghz3=",ghz3,"i"
                if( cdabs(ghz4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghz4=",ghz4,"i"
+               if( calc_fL .ne. 0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "fL=",fL,"i"
+               if( calc_fL .ne. 0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "calc_fL=",calc_fL,"i"
                if( cdabs(ghz1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime= ",ghz1_prime ,"i,","Lambda_z1=",Lambda_z1/GeV
                if( cdabs(ghz1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime2=",ghz1_prime2,"i,","Lambda_z1=",Lambda_z1/GeV
                if( cdabs(ghz1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime3=",ghz1_prime3,"i,","Lambda_z1=",Lambda_z1/GeV
