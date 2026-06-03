@@ -37,7 +37,7 @@ c--- expected to be unreliable, namely pt(Z)<ptZsafetycut set below
       include 'ewcharge.f'
       logical dolight,dobottom,dotop,ggZZuse6d
       integer h1,h2,h34,h56,up,dn,om,nu
-      double precision p(mxpart,4),cvec(2),cax(2),cl1(2),cl2(2),
+      double precision p(mxpart,4),cvec(3),cax(3),cl1(2),cl2(2),
      & ptZsafetycut_massless,ptZsafetycut_massive,ptZ,pttwo
       double precision phi,muk,rho,ssig,csig,theta,
      & p1true(4),p2true(4),p3true(4),p4true(4),p5true(4),p6true(4)
@@ -201,15 +201,19 @@ c --- Modified by Jeff
 c--- vector and axial couplings as an array for up/down quarks
       cvec(up)=half*(L(up)+R(up))
       cvec(dn)=half*(L(dn)+R(dn))
+      cvec(3)=half*(L(up)+R(up))
       cax(up)=half*(L(up)-R(up))
       cax(dn)=half*(L(dn)-R(dn))
+      cax(3)=half*(L(up)-R(up))
 
 c--- Optionally will add shifts to SM up and down type Zqq couplings
       if (AllowAnomalousZffCouplings .eq. 1) then 
         cvec(up)=half*(L(up)+R(up)) + (clanou+cranou)/2.
         cvec(dn)=half*(L(dn)+R(dn)) + (clanod+cranod)/2.
+        cvec(3)=half*(L(up)+R(up)) + (clanot+cranot)/2.
         cax(up)=half*(L(up)-R(up))  + (clanou-cranou)/2.
         cax(dn)=half*(L(dn)-R(dn))  + (clanod-cranod)/2.
+        cax(3)=half*(L(up)-R(up))  + (clanot-cranot)/2.
       endif
 
 c--- dress vector and axial amplitudes with appropriate couplings
@@ -250,8 +254,8 @@ c--- implementation of t-quark loop in terms of vector and axial couplings
       Amt_ax =2d0*(AmtLL(h1,h2,h34,h56)-AmtLR(h1,h2,h34,h56))
       Mloop_tquark(h1,h2,h34,h56)=im*(
      & Amt_vec*
-     & (Qu*q1+cvec(up)*cl1(h34)*prop34)*(Qu*q2+cvec(up)*cl2(h56)*prop56)
-     &+Amt_ax*(cax(up)*cl1(h34)*prop34)*(cax(up)*cl2(h56)*prop56))
+     & (Qu*q1+cvec(3)*cl1(h34)*prop34)*(Qu*q2+cvec(3)*cl2(h56)*prop56)
+     &+Amt_ax*(cax(3)*cl1(h34)*prop34)*(cax(3)*cl2(h56)*prop56))
       else
         Mloop_tquark(h1,h2,h34,h56)=czip
       endif
