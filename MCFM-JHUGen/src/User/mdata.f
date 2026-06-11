@@ -392,6 +392,11 @@ c     left handed Z couplings to neutrinos
 c     right handed Z couplings to neutrinos
       data rnZ / 0d0 / ! SM = 0 
 
+c     Anomalous Couplings for the Z to the top quark in production
+c     Note, these are called as shifts to SM values
+      data clanot / 0d0 / ! SM unshifted = 0.82039507607344309
+      data cranot / 0d0 / ! SM unshifted = -0.36558111377463703
+
 c     Anomalous Couplings for the Z to up type quarks in production 
 c     Note, these are called as shifts to SM values
       data clanou / 0d0 / ! SM = 0
