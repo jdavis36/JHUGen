@@ -19,7 +19,7 @@ Comp = gfort
 ## USER FLAGS ##
 ################
 ## link pdfs via LHA library ('Yes' or 'No')
-UseLHAPDF=No
+UseLHAPDF=Yes
 # remember to export
 #          LD_LIBRARY_PATH=/.../LHAPDF-x.y.z/lib/:${LD_LIBRARY_PATH}
 #          LHAPDF_DATA_PATH=/.../LHAPDF-x.y.z/share/LHAPDF/:${LHAPDF_DATA_PATH}
@@ -38,7 +38,8 @@ linkCollierLib = No
 ## LHAPDF options
 # directory which contains libLHAPDF.a, libLHAPDF.la, libLHAPDF.so
 # this one in terms of the environment variable should work in most cases
-MyLHADir=${LHAPDF_DATA_PATH}/../../lib/
+# MyLHADir=${LHAPDF_DATA_PATH}/../../lib/
+MyLHADir=/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/lhapdf/6.4.0-4e88284e67a089aac160fa1dec1b2ac4/lib/
 
 ifeq ($(UseLHAPDF),Yes)
    LHAPDFflags = -L$(MyLHADir) -lLHAPDF -I$(MyLHADir)/../include -DuseLHAPDF=1 -lstdc++
