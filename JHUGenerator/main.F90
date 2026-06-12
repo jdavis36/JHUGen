@@ -6788,7 +6788,7 @@ character :: arg*(1000)
             endif
         endif
     endif
-    if( ((Process.eq.0 .and. Process.eq.10) .and. (TauDecays.ge.0)) .or. Process.eq.80 .or. Process.eq.90 .or. (Process.eq.51 .and. VH_PC.ne."tr" .and. VH_PC.ne."ee" .and. VH_PC.ne."qq") ) then
+    if( ((Process.eq.0 .or. Process.eq.10) .and. (TauDecays.ge.0)) .or. Process.eq.80 .or. Process.eq.90 .or. (Process.eq.51 .and. VH_PC.ne."tr" .and. VH_PC.ne."ee" .and. VH_PC.ne."qq") ) then
         write(TheUnit,"(4X,A)") "spin-0-ff couplings: "
         if( cdabs(kappa ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa=",kappa,"i"
         if( cdabs(kappa_tilde ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa_tilde=",kappa_tilde,"i"
