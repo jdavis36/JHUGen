@@ -19,6 +19,7 @@ Command line parameters for quick reference:
     ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,
                        250 GeV for e+e-
     Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance,
+                       10=full phase space in angles,
                        50=qq/ee->VH, 51=gg->ZH,
                        60=VBF, 61=pp->Hjj, 62=pp->Hj,
                        66=EW VVJJ sig., 67=EW VVJJ bkg., 68=EW VVJJ tot.,
