@@ -19,7 +19,7 @@ Command line parameters for quick reference:
     ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,
                        250 GeV for e+e-
     Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance,
-                       10=full phase space in angles,
+                       10=phase space in decay of a resonance,
                        50=qq/ee->VH, 51=gg->ZH,
                        60=VBF, 61=pp->Hjj, 62=pp->Hj,
                        66=EW VVJJ sig., 67=EW VVJJ bkg., 68=EW VVJJ tot.,
@@ -32,18 +32,13 @@ Command line parameters for quick reference:
                        114=t/tbar+H t/s channels
                        115=t+W+H, 116=tbar+W+H
                        117=t/tbar+W+H
-    Polarization:      fL = (-1, 1) fPerp = (-1, 1) 
-                       Polarization of spin 0 resonance. 
-                       When calc_fL=1, fL and fPerp can be real number from -1 to 1.
-                       When calc_fL=2, fL = 0 or 1, fPerp =0. 
-                       Need to set with calc_fL at the same time.
-                       calc_fL = 0, 1, 2
-                       calc_fAmp = -1, 1, 2, -11 
-                       Polarization of spin 2 resonance. 
-                       -1 is spin 1- projection. 
-                       1 is spin 1+ projection. 
-                       2 is spin 2+ projection. 
-                       -11 is interference between spin 1+ and spin 1-.
+    Polarization:      For Process 0:
+                       fL = longitudinal polarization (-1, 1),
+                       fPerp = CP-odd transverse polarization (-1, 1) 
+                       calc_fL = method for modelling polarized states (1 to activate)
+                       For Process 2:
+                       calc_fAmp = option for Jz^P of resonance 
+                       (-1 for Jz^P = 1^-, 1 for 1^+,2 for 2^+, -11 for interference 1^+ and 1^-)
     DecayMode1:        decay mode for vector boson 1 (Z/W/gamma)
     DecayMode2:        decay mode for vector boson 2 (Z/W/gamma)
                          0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->2nu,
