@@ -756,6 +756,319 @@ jobs:
 #          paths: ~/JHUGen/JHUGenerator/no-need-for-ggH-plots/
 #      - run: '! [ -f reference_check/reference_failed_ggH ]'
 
+
+  plots_VBF_g1:
+    <<: *env
+    working_directory: ~/JHUGen/JHUGenerator
+    steps:
+      - attach_workspace:
+          at: ~/JHUGen
+      - restore_cache:
+          key: v1_analyzer
+      - run:
+          <<: *cmsrelcmsenv
+      - run:
+          <<: *jhugenversion
+      - run:
+          command: |
+            cd
+            if ! [ -d ~/CMSJHU_AnalysisMacros/ ]; then
+              git clone -b noMELA https://github.com/hroskes/CMSJHU_AnalysisMacros
+            fi
+            cd CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer
+            git pull
+            make all
+      - save_cache:
+          key: v1_analyzer
+          paths: ~/CMSJHU_AnalysisMacros/      - run: echo "export LHEDIR=$HOME/artifacts/VBF" >> $BASH_ENV
+      - run: mkdir -p $LHEDIR/
+      - run:
+          name: "md5sum of files relevant for VBF plots"
+          command: |
+            cd ..
+            md5sum JHUGenerator/reference-lhes-md5sum-VBF $(
+              git ls-files \
+                .circleci/VBFplots.C \
+              | sort
+            ) > JHUGenerator/VBF-plots-md5sum
+      - restore_cache:
+          key: v1-VBF-do-i-need-plots-{{ checksum "VBF-plots-md5sum" }}
+      - run:
+          name: "see if we need VBF plots"
+          command: |
+            DOPLOTS=true
+            if [ "$(cat no-need-for-VBF-plots)" ]; then
+              DOPLOTS=false
+            fi
+            echo "export DOPLOTS=$DOPLOTS" >> $BASH_ENV
+      - run:
+          name: generate
+          command: |
+            if $DOPLOTS; then
+              ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$LHEDIR/SM pTjetcut=0 deltaRcut=0
+              ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$LHEDIR/SM.lhe DataFile=$LHEDIR/SM_decayed
+            else
+              echo "The LHE files can be found in the artifacts at $(cat no-need-for-VBF-plots)"
+            fi
+      - run:
+          name: analyzer
+          command: |
+            if $DOPLOTS; then
+              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SM.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 SM_decayed.lhe
+            else
+              echo "The root files can be found in the artifacts at $(cat no-need-for-VBF-plots)"
+            fi
+      - run:
+          name: plots
+           command: |
+             if $DOPLOTS; then
+               cd ../.circleci
+               root -b -q 'VBFplots.C+(0)'
+             else
+               echo "The plots can be found in the artifacts at $(cat no-need-for-VBF-plots)"
+             fi
+      - store_artifacts:
+          path: ~/artifacts/VBF
+      - run: echo "$CIRCLE_BUILD_URL" > no-need-for-VBF-plots
+      - save_cache:
+          key: v1-VBF-do-i-need-plots-{{ checksum "VBF-plots-md5sum" }}
+          paths: ~/JHUGen/JHUGenerator/no-need-for-VBF-plots
+      - run: '! [ -f reference_check/reference_failed_VBF ]'
+
+  plots_VBF_g2:
+    <<: *env
+    working_directory: ~/JHUGen/JHUGenerator
+    steps:
+      - attach_workspace:
+          at: ~/JHUGen
+      - restore_cache:
+          key: v1_analyzer
+      - run:
+          <<: *cmsrelcmsenv
+      - run:
+          <<: *jhugenversion
+      - run:
+          command: |
+            cd
+            if ! [ -d ~/CMSJHU_AnalysisMacros/ ]; then
+              git clone -b noMELA https://github.com/hroskes/CMSJHU_AnalysisMacros
+            fi
+            cd CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer
+            git pull
+            make all
+      - save_cache:
+          key: v1_analyzer
+          paths: ~/CMSJHU_AnalysisMacros/      - run: echo "export LHEDIR=$HOME/artifacts/VBF" >> $BASH_ENV
+      - run: mkdir -p $LHEDIR/
+      - run:
+          name: "md5sum of files relevant for VBF plots"
+          command: |
+            cd ..
+            md5sum JHUGenerator/reference-lhes-md5sum-VBF $(
+              git ls-files \
+                .circleci/VBFplots.C \
+              | sort
+            ) > JHUGenerator/VBF-plots-md5sum
+      - restore_cache:
+          key: v1-VBF-do-i-need-plots-{{ checksum "VBF-plots-md5sum" }}
+      - run:
+          name: "see if we need VBF plots"
+          command: |
+            DOPLOTS=true
+            if [ "$(cat no-need-for-VBF-plots)" ]; then
+              DOPLOTS=false
+            fi
+            echo "export DOPLOTS=$DOPLOTS" >> $BASH_ENV
+      - run:
+          name: generate
+          command: |
+            if $DOPLOTS; then
+              ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$LHEDIR/a2 ghz1=0,0 ghz2=1,0 pTjetcut=0 deltaRcut=0
+              ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$LHEDIR/a2.lhe DataFile=$LHEDIR/a2_decayed ghz1=0,0 ghz2=1,0
+            else
+              echo "The LHE files can be found in the artifacts at $(cat no-need-for-VBF-plots)"
+            fi
+      - run:
+          name: analyzer
+          command: |
+            if $DOPLOTS; then
+              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=a2.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 a2_decayed.lhe
+            else
+              echo "The root files can be found in the artifacts at $(cat no-need-for-VBF-plots)"
+            fi
+      - run:
+          name: plots
+           command: |
+             if $DOPLOTS; then
+               cd ../.circleci
+               root -b -q 'VBFplots.C+(2)'
+             else
+               echo "The plots can be found in the artifacts at $(cat no-need-for-VBF-plots)"
+             fi
+      - store_artifacts:
+          path: ~/artifacts/VBF
+      - run: echo "$CIRCLE_BUILD_URL" > no-need-for-VBF-plots
+      - save_cache:
+          key: v1-VBF-do-i-need-plots-{{ checksum "VBF-plots-md5sum" }}
+          paths: ~/JHUGen/JHUGenerator/no-need-for-VBF-plots
+      - run: '! [ -f reference_check/reference_failed_VBF ]'
+
+  plots_VBF_g4:
+    <<: *env
+    working_directory: ~/JHUGen/JHUGenerator
+    steps:
+      - attach_workspace:
+          at: ~/JHUGen
+      - restore_cache:
+          key: v1_analyzer
+      - run:
+          <<: *cmsrelcmsenv
+      - run:
+          <<: *jhugenversion
+      - run:
+          command: |
+            cd
+            if ! [ -d ~/CMSJHU_AnalysisMacros/ ]; then
+              git clone -b noMELA https://github.com/hroskes/CMSJHU_AnalysisMacros
+            fi
+            cd CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer
+            git pull
+            make all
+      - save_cache:
+          key: v1_analyzer
+          paths: ~/CMSJHU_AnalysisMacros/      - run: echo "export LHEDIR=$HOME/artifacts/VBF" >> $BASH_ENV
+      - run: mkdir -p $LHEDIR/
+      - run:
+          name: "md5sum of files relevant for VBF plots"
+          command: |
+            cd ..
+            md5sum JHUGenerator/reference-lhes-md5sum-VBF $(
+              git ls-files \
+                .circleci/VBFplots.C \
+              | sort
+            ) > JHUGenerator/VBF-plots-md5sum
+      - restore_cache:
+          key: v1-VBF-do-i-need-plots-{{ checksum "VBF-plots-md5sum" }}
+      - run:
+          name: "see if we need VBF plots"
+          command: |
+            DOPLOTS=true
+            if [ "$(cat no-need-for-VBF-plots)" ]; then
+              DOPLOTS=false
+            fi
+            echo "export DOPLOTS=$DOPLOTS" >> $BASH_ENV
+      - run:
+          name: generate
+          command: |
+            if $DOPLOTS; then
+              ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$LHEDIR/PS ghz1=0,0 ghz4=1,0  pTjetcut=0 deltaRcut=0
+              ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$LHEDIR/PS.lhe DataFile=$LHEDIR/PS_decayed ghz1=0,0 ghz4=1,0
+            else
+              echo "The LHE files can be found in the artifacts at $(cat no-need-for-VBF-plots)"
+            fi
+      - run:
+          name: analyzer
+          command: |
+            if $DOPLOTS; then
+              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=PS.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 PS_decayed.lhe
+            else
+              echo "The root files can be found in the artifacts at $(cat no-need-for-VBF-plots)"
+            fi
+      - run:
+          name: plots
+           command: |
+             if $DOPLOTS; then
+               cd ../.circleci
+               root -b -q 'VBFplots.C+(1)'
+             else
+               echo "The plots can be found in the artifacts at $(cat no-need-for-VBF-plots)"
+             fi
+      - store_artifacts:
+          path: ~/artifacts/VBF
+      - run: echo "$CIRCLE_BUILD_URL" > no-need-for-VBF-plots
+      - save_cache:
+          key: v1-VBF-do-i-need-plots-{{ checksum "VBF-plots-md5sum" }}
+          paths: ~/JHUGen/JHUGenerator/no-need-for-VBF-plots
+      - run: '! [ -f reference_check/reference_failed_VBF ]'
+
+  plots_HJJ_SM:
+    <<: *env
+    working_directory: ~/JHUGen/JHUGenerator
+    steps:
+      - attach_workspace:
+          at: ~/JHUGen
+      - restore_cache:
+          key: v1_analyzer
+      - run:
+          <<: *cmsrelcmsenv
+      - run:
+          <<: *jhugenversion
+      - run:
+          command: |
+            cd
+            if ! [ -d ~/CMSJHU_AnalysisMacros/ ]; then
+              git clone -b noMELA https://github.com/hroskes/CMSJHU_AnalysisMacros
+            fi
+            cd CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer
+            git pull
+            make all
+      - save_cache:
+          key: v1_analyzer
+          paths: ~/CMSJHU_AnalysisMacros/      - run: echo "export LHEDIR=$HOME/artifacts/VBF" >> $BASH_ENV
+      - run: mkdir -p $LHEDIR/
+      - run:
+          name: "md5sum of files relevant for VBF plots"
+          command: |
+            cd ..
+            md5sum JHUGenerator/reference-lhes-md5sum-VBF $(
+              git ls-files \
+                .circleci/VBFplots.C \
+              | sort
+            ) > JHUGenerator/VBF-plots-md5sum
+      - restore_cache:
+          key: v1-VBF-do-i-need-plots-{{ checksum "VBF-plots-md5sum" }}
+      - run:
+          name: "see if we need VBF plots"
+          command: |
+            DOPLOTS=true
+            if [ "$(cat no-need-for-VBF-plots)" ]; then
+              DOPLOTS=false
+            fi
+            echo "export DOPLOTS=$DOPLOTS" >> $BASH_ENV
+      - run:
+          name: generate
+          command: |
+            if $DOPLOTS; then
+              ./JHUGen PDFSet=3 Process=61 VegasNc0=10000000 VegasNc2=10000 DataFile=$LHEDIR/HJJ_SM
+              ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$LHEDIR/HJJ_SM.lhe DataFile=$LHEDIR/HJJ_SM_decayed
+            else
+              echo "The LHE files can be found in the artifacts at $(cat no-need-for-VBF-plots)"
+            fi
+      - run:
+          name: analyzer
+          command: |
+            if $DOPLOTS; then
+              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=HJJ_SM.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 HJJ_SM_decayed.lhe
+            else
+              echo "The root files can be found in the artifacts at $(cat no-need-for-VBF-plots)"
+            fi
+      - run:
+          name: plots
+           command: |
+             if $DOPLOTS; then
+               cd ../.circleci
+               root -b -q 'VBFplots.C+(3)'
+             else
+               echo "The plots can be found in the artifacts at $(cat no-need-for-VBF-plots)"
+             fi
+      - store_artifacts:
+          path: ~/artifacts/VBF
+      - run: echo "$CIRCLE_BUILD_URL" > no-need-for-VBF-plots
+      - save_cache:
+          key: v1-VBF-do-i-need-plots-{{ checksum "VBF-plots-md5sum" }}
+          paths: ~/JHUGen/JHUGenerator/no-need-for-VBF-plots
+      - run: '! [ -f reference_check/reference_failed_VBF ]'
+
   # plots_VBF:
   #   <<: *env
   #   working_directory: ~/JHUGen/JHUGenerator
@@ -1205,9 +1518,18 @@ workflows:
       #- plots_ggH:
       #    requires:
       #      - generator_reference
-      # - plots_VBF:
-      #     requires:
-      #       - generator_reference
+      - plots_VBF_g1:
+           requires:
+             - generator_reference
+      - plots_VBF_g2:
+           requires:
+             - generator_reference
+      - plots_VBF_g4:
+           requires:
+             - generator_reference
+      - plots_HJJ_SM:
+           requires:
+             - generator_reference       
       - reference_check:
           requires:
             - generator_reference
