@@ -23,13 +23,13 @@
 \large
 Manual for the JHU generator and MELA package
 }
-\author{I. Anderson, S. Bolognesi, F. Caola, J. Davis, Y. Gao, A. V. Gritsan, L. S. Mandacaru Guerra, Z. Guo, L. Kang, S. Kyriacou, C. B. Martin, T. Martini, K. Melnikov, 
+\author{I. Anderson, S. Bolognesi, F. Caola, J. Davis, Y. Gao, A. V. Gritsan, L. S. Mandacaru Guerra, Z. Guo, Z. Huang, L. Kang, S. Kyriacou, C. B. Martin, T. Martini, K. Melnikov, 
 R. Pan, M. Panagiotou, R. Rontsch, J. Roskes, U. Sarica, M. Schulze, M. V. Srivastav, N. V. Tran, A. Whitbeck, M. Xiao, Y. Zhou}
 \maketitle
 \begin{center}
 \small
 For simulation, reweighting, and analysis of resonances produced at hadron colliders \\
-(version v7.5.7, release date December 20, 2024) \\
+(version v7.6.0, release date June 12, 2026) \\
 \normalsize
 \end{center}
 
@@ -486,6 +486,7 @@ This is the list of command line configurables (also defined in the \verb|README
     ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,
                        250 GeV for e+e-
     Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance,
+                       10=phase space in decay of a resonance,
                        50=qq/ee->VH, 51=gg->ZH,
                        60=VBF, 61=pp->Hjj, 62=pp->Hj,
                        66=EW VVJJ sig., 67=EW VVJJ bkg., 68=EW VVJJ tot.,
@@ -498,18 +499,13 @@ This is the list of command line configurables (also defined in the \verb|README
                        114=t/tbar+H t/s channels
                        115=t+W+H, 116=tbar+W+H
                        117=t/tbar+W+H
-    Polarization:      fL = (-1, 1) fPerp = (-1, 1) 
-                       Polarization of spin 0 resonance. 
-                       When calc_fL=1, fL and fPerp can be real number from -1 to 1.
-                       When calc_fL=2, fL = 0 or 1, fPerp =0. 
-                       Need to set with calc_fL at the same time.
-                       calc_fL = 0, 1, 2
-                       calc_fAmp = -1, 1, 2, -11 
-                       Polarization of spin 2 resonance. 
-                       -1 is spin 1- projection. 
-                       1 is spin 1+ projection. 
-                       2 is spin 2+ projection. 
-                       -11 is interference between spin 1+ and spin 1-.
+    Polarization:      For Process 0:
+                       fL = longitudinal polarization (-1, 1),
+                       fPerp = CP-odd transverse polarization (-1, 1) 
+                       calc_fL = method for modelling polarized states (1 to activate)
+                       For Process 2:
+                       calc_fAmp = option for Jz^P of resonance 
+                       (-1 for Jz^P = 1^-, 1 for 1^+,2 for 2^+, -11 for interference 1^+ and 1^-)
     DecayMode1:        decay mode for vector boson 1 (Z/W/gamma)
     DecayMode2:        decay mode for vector boson 2 (Z/W/gamma)
                          0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->2nu,
@@ -1520,6 +1516,8 @@ Anomalous Zff couplings are listed below:
     data cranou / 0d0 / shift in right handed coupling of Z to up type quarks in production 
     data clanod / 0d0 / shift in left handed coupling of Z to down type quarks in production  
     data cranod / 0d0 / shift in right handed coupling of Z to down type quarks in production  
+    data clanot / 0d0 / shift in left handed coupling of Z to top quarks in production
+    data cranot / 0d0 / shift in right handed coupling of Z to top quarks in production
 \end{verbatim}
 Be sure to recompile MCFM to make sure the coupling changes are implemented. Then to run your process do 
 \begin{verbatim}
@@ -1546,16 +1544,28 @@ mela->selfDAZffcoupl[gAZff_ZuuRH] = -0.30825
 mela->selfDAZffcoupl[gAZff_ZddRH] = 0.15413
 mela->selzDAZffcoupl[gAZff_ZnnRH]b = 1
 mela->selfDAZffcoupl[gAZff_uZLH] = 0.1 
+mela->selfDAZffcoupl[gAZff_tZRH] = 0.2
 \end{verbatim}
 
-This would correspond to SM Zll couplings, and SM Z couplings to right handed quarks. The Z coupling to right-handed neutrinos is set to 1 and the SM Z coupling to left-handed
-up-type quarks in production is shifted by 0.1. Again in this example, since the other Zff couplings are not set, they are set to 0 in the matrix element calculation.
+This would correspond to SM Zll couplings, and SM Z couplings to right handed quarks. The Z coupling to right-handed neutrinos is set to 1, SM Z coupling to left-handed
+up-type quarks in production is shifted by 0.1 and SM Z coupling to right-handed top quarks is shifted by 0.2 . Again in this example, since the other Zff couplings are not set, they are set to 0 in the matrix element calculation. Please also note that applying a shift to the up-type quarks and the top quark will result in the SM Z coupling to the top quark being shifted twice.
 
 \section{Release notes}
+\noindent
+In going from \verb|v7.5.7| to \verb|v7.6.0| (June 12, 2026) the updates are as follows:
+\begin{itemize}
+    \item Introduced Higgs self-coupling in EW production into the MCFM matrix element.
+    \item Added \verb|Process=10| which allows for uniformly weighted simulation of $gg \to X\to VV$ phase space without consideration of the matrix-element
+    \item Introduce polarization framework, which allows for simulation of specific polarization fractions in the decay of any resonance $X\to VV$
+    \item Separated the anomalous couplings of the Z boson fermion couplings in the MCFM matrix element to privilege the top quark from the other up type quarks.
+    \item Add new option to JHUGenLexicon for applying the MCFM convention to anomalous triple and quartic-gauge couplings 
+    \item Add width scheme 5 for running widths of very narrow resonances
+\end{itemize}
 \noindent
 In going from \verb|v7.5.6| to \verb|v7.5.7| (December 20, 2024) the updates are as follows:
 \noindent
 \begin{itemize}
+\item Introduce $q^2$ dependent form factor in Higgs boson propagator in MCFM matrix elements. 
 \item Introduced signal, background, and BSI matrix elements for $\{u,d,c,s,b\} \rightarrow 4\ell$ utilizing Madgraph matrix elements within madMELA.
 \item Introduced Higgs self-coupling for gluon-fusion into the MCFM matrix element.
 We would like to thank Ulrich Haisch and Gabriël Koole for their efforts in including

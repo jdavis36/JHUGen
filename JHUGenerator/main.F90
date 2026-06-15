@@ -61,7 +61,7 @@ integer :: iddk1_mcfm,iddk2_mcfm
    elseif( DoPrintPMZZ ) then
         call PrintMZZdistribution()
    else
-        if( Process.eq.0 .or. Process.eq.1  .or. Process.eq.2 .or. Process.eq.80 &
+        if( Process.eq.0 .or. Process.eq.1  .or. Process.eq.2 .or. Process.eq.10 .or.  Process.eq.80 &
                          .or. Process.eq.60 .or. Process.eq.61 .or. (Process.ge.66 .and. Process.le.75) &
                          .or. Process.eq.90 .or. Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 .or. Process.eq.114 .or. Process.eq.115 .or. Process.eq.116 .or. Process.eq.117 ) then
            call StartVegas_NEW(VG_Result,VG_Error)
@@ -106,6 +106,7 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             Process.eq. 0 .or.  &
             Process.eq. 1 .or.  &
             Process.eq. 2 .or.  &
+            Process.eq. 10 .or.  &
             Process.eq.50 .or.  &
             Process.eq.51 .or.  &
             Process.eq.52 .or.  &
@@ -142,7 +143,8 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
          if( &
          Process.eq. 0 .or. & !- ggH spin-0
          Process.eq. 1 .or. & !- ggH spin-1
-         Process.eq. 2      & !- ggH spin-2
+         Process.eq. 2 .or. & !- ggH spin-2
+         Process.eq.10      & !- ggH spin-0 flat space
          ) then
             FacScheme = +kRenFacScheme_mhstar
             MuFacMultiplier = 0.5d0
@@ -197,7 +199,8 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
          if( &
          Process.eq. 0 .or. & !- ggH spin-0
          Process.eq. 1 .or. & !- ggH spin-1
-         Process.eq. 2      & !- ggH spin-2
+         Process.eq. 2 .or. & !- ggH spin-2
+         Process.eq.10      &
          ) then
             RenScheme = +kRenFacScheme_mhstar
             MuRenMultiplier = 0.5d0
@@ -324,7 +327,8 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
          (                     &
             Process.eq. 0 .or. & !- ggH spin-0
             Process.eq. 1 .or. & !- ggH spin-1
-            Process.eq. 2      & !- ggH spin-2
+            Process.eq. 2 .or. & !- ggH spin-2
+            Process.eq.10      &
          ) .and. (             &
             (abs(FacScheme).ne.kRenFacScheme_mhstar) .or. (abs(RenScheme).ne.kRenFacScheme_mhstar)      &
          )                     &
@@ -346,7 +350,7 @@ SUBROUTINE SetJHUGenDefaults()
    VegasNc0=-1
    VegasNc1=-1
    VegasNc2=-1
-   Process = 0   ! select 0, 1 or 2 to represent the spin of the resonance
+   Process = 0   ! select 0, 1 or 2 to represent the spin of the resonance, 10 is for spin 0 but full phase space 
    PChannel=2
    DecayMode1=0  ! Z/W+
    DecayMode2=0  ! Z/W-
@@ -1348,7 +1352,7 @@ type(SaveValues) :: tosave, oldsavevalues
     endif
 
     !PChannel
-    if (Process.eq.0 .or. (Process.ge.73 .and. Process.le.75)) PChannel = 0   !only gluons
+    if (Process.eq.0 .or. Process.eq.10 .or. (Process.ge.73 .and. Process.le.75)) PChannel = 0   !only gluons
 !Yaofu Zhou ggZH
     !if (Process.eq.1 .or. Process.eq.51 .or. Process.eq.60 .or. Process.eq.66 .or. Process.eq.67 .or. Process.eq.68) PChannel = 1   !only quarks
     if (Process.eq.1 .or. Process.eq.60 .or. (Process.ge.66 .and. Process.le.68) .or. (Process.ge.70 .and. Process.le.72)) PChannel = 1   !only quarks
@@ -1458,7 +1462,7 @@ type(SaveValues) :: tosave, oldsavevalues
     ! The following Set*coupling assume the user did not set those couplings to 0, which is in fact a trivial possibility.
     if( &
        (SetZZcoupling .or. SetZgammacoupling .or. ghz1.ne.czero) .and. SetHZprime &
-       .and. (Process.le.2 .or. Process.eq.50 .or. Process.eq.51) &
+       .and. (Process.le.12 .or. Process.eq.50 .or. Process.eq.51) &
        .and. (M_Zprime.ge.0d0 .and. IsAZDecay(DecayMode1) .or. M_Wprime.ge.0d0 .and. IsAWDecay(DecayMode1)) &
     ) then
        if (VprimeDecayLengthMassCutoffFactor.le.0d0) then
@@ -1466,7 +1470,7 @@ type(SaveValues) :: tosave, oldsavevalues
        endif
     else if( &
        .not.SetZZcoupling .and. .not.SetZgammacoupling .and. SetHZprime &
-       .and. (Process.le.2 .or. Process.eq.50 .or. Process.eq.51) &
+       .and. (Process.le.12 .or. Process.eq.50 .or. Process.eq.51) &
        .and. ((Process.eq.1 .or. Process.eq.2) .or. ghz1.eq.czero) &    !for the spin-0 resonances, you have to have explicitly turned off the SM ghz1 coupling
        .and. (M_Zprime.ge.0d0 .and. IsAZDecay(DecayMode1) .or. M_Wprime.ge.0d0 .and. IsAWDecay(DecayMode1)) &
        ) then
@@ -1553,9 +1557,9 @@ type(SaveValues) :: tosave, oldsavevalues
     endif
 
     !decay mode checks
-    if( (IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) .and. (Process.eq.0 .or. Process.eq.2) .and. TauDecays.lt.0) .or. (Process.ge.50 .and. Process.le.51 .and. IsAZDecay(DecayMode1)) .or. Process.eq.60 .or. Process.eq.66 .or. Process.eq.70 .or. Process.eq.73 ) then
+    if( (IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) .and. (Process.eq.0 .or. Process.eq.2 .or. Process.eq.10) .and. TauDecays.lt.0) .or. (Process.ge.50 .and. Process.le.51 .and. IsAZDecay(DecayMode1)) .or. Process.eq.60 .or. Process.eq.66 .or. Process.eq.70 .or. Process.eq.73 ) then
         includeGammaStar = (SetZgammacoupling .or. Setgammagammacoupling .or. SetZprimegammacoupling)
-    elseif( (IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. (Process.eq.0 .or. Process.eq.2) .and. TauDecays.lt.0) .or. (Process.ge.50 .and. Process.le.51 .and. IsAPhoton(DecayMode1)) ) then
+    elseif( (IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. (Process.eq.0 .or. Process.eq.2 .or. Process.eq.10) .and. TauDecays.lt.0) .or. (Process.ge.50 .and. Process.le.51 .and. IsAPhoton(DecayMode1)) ) then
         includeGammaStar = Setgammagammacoupling
     else if (Process.eq.67 .or. Process.eq.68 .or. Process.eq.71 .or. Process.eq.72 .or. Process.eq.74 .or. Process.eq.75 .or. Process.eq.69) then
         includeGammaStar = .true. ! Not really gamma*, but rather gamma* or gluon, set to true to manipulate phasespace generation
@@ -1732,7 +1736,7 @@ type(SaveValues) :: tosave, oldsavevalues
        print *,"Z is offshell and photon is on-shell in Z+photon production."
        print *,"Randomization of the order of writing of the decay products to the LHE file is disabled."
        RandomizeVVdecays = .false.
-    elseif( IsAPhoton(DecayMode2) .and. IsAPhoton(DecayMode1) .and. Process.le.2 ) then
+    elseif( IsAPhoton(DecayMode2) .and. IsAPhoton(DecayMode1) .and. Process.le.12 ) then
        print *,"Both photons are on-shell in photon+photon production."
     endif
     OffShellV1=.not.IsAPhoton(DecayMode1)
@@ -1963,7 +1967,7 @@ type(SaveValues) :: tosave, oldsavevalues
    endif
 
     ! Contact terms
-    if (Process.le.2 .or. Process.eq.50 .or. Process.eq.51 .or. Process.eq.60) then
+    if ((Process.le.12 .or. Process.eq.50 .or. Process.eq.51 .or. Process.eq.60) ) then
         if (IsAZDecay(DecayMode1) .or. ((Process.eq.50 .or. Process.eq.51) .and. IsAPhoton(DecayMode1))) then
             if ((SetHZprime .and. .not.SetZprimeff) .or. (.not.SetHZprime .and. SetZprimeff)) then
                 call Error("To use Z' contact terms, you have to set both HVZ' and Z'ff couplings")
@@ -2393,7 +2397,7 @@ include "vegas_common.f"
       endif
 
       !- gg-->spin0-->4f
-      if(Process.eq.0 ) then
+      if(Process.eq.0 .or. Process.eq.10) then
         NDim = 11
       endif
       !- gg-->spin1-->4f
@@ -3043,7 +3047,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
   endif! unweighted
 
 
-    if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) then
+    if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 .or. Process.eq.10) then
           write(*,*) ""
           write(*,"(A)") "                 el              mu             tau             neu              jet"
           write(*,"(A,5F16.4)") " el ",dble(Br_counter(1,1:5))/dble(AccepCounter)
@@ -3188,7 +3192,7 @@ character(len=len(CSmaxFile)+20) :: FileToRead
          itmx = VegasIt1
          ncall= VegasNc1
          warmup = .true.
-         if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
+         if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 .or. Process.eq.10) call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
          if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
          if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
 
@@ -3227,7 +3231,7 @@ character(len=len(CSmaxFile)+20) :: FileToRead
        avgcs = 0d0
        itmx = 2
        ncall= VegasNc2
-       if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
+       if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 .or. Process.eq.10) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
        if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
        if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
 
@@ -3278,7 +3282,7 @@ character(len=len(CSmaxFile)+20) :: FileToRead
              else
                  readin=.false.
                  writeout=.true.
-                 if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 .or. Process.eq.10) call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
                  if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
                  if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
                  if( Process.ge.73 .and. Process.le.75 ) call vegas(EvalWeighted_gg4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
@@ -3294,7 +3298,7 @@ character(len=len(CSmaxFile)+20) :: FileToRead
                  itmx = 2
                  writeout=.true.
                  outgridfile = trim(CSmaxFile)//'_step2.grid'
-                 if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 .or. Process.eq.10) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
          !         if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2) ! adjust to LHE format
          !         if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
                  if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
@@ -3314,7 +3318,7 @@ character(len=len(CSmaxFile)+20) :: FileToRead
                  CrossSec(:,:) = 0d0
                  print *, "resetting CrossSecMax(:,:)"
                  itmx = 1
-                 if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 .or. Process.eq.10) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
          !         if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2) ! adjust to LHE format
          !         if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
                  if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
@@ -3353,7 +3357,7 @@ character(len=len(CSmaxFile)+20) :: FileToRead
                call HouseOfRepresentatives(CrossSec(-5:5,-5:5), RequEvents(-5:5,-5:5), VegasNc2)
              endif
 
-             if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2) then
+             if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 .or. Process.eq.10) then
                 call getRef_PPXchannelHash(ijSel)
              elseif( Process.eq.60 ) then
                 call getRef_VBFchannelHash(ijSel)
@@ -3416,7 +3420,7 @@ character(len=len(CSmaxFile)+20) :: FileToRead
          !     do while( AccepCounter_part(iPart_sel,jPart_sel).lt.RequEvents(iPart_sel,jPart_sel) )
                  call cpu_time(time_start)
 
-                 if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 .or. Process.eq.10) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
          !         if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)! adjust to LHE format
              !     if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
                  if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
@@ -6195,7 +6199,7 @@ character :: arg*(1000)
     if( Collider.eq.0 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: e+ e-, sqrt(s)=",Collider_Energy/GeV
     if( Collider.eq.1 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: P-P, sqrt(s)=",Collider_Energy/GeV
     if( Collider.eq.2 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: P-Pbar, sqrt(s)=",Collider_Energy/GeV
-    if( Process.eq.0 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.0 .or. Process.eq.10) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
     if( Process.eq.1 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=1, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
     if( Process.eq.2 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=2, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
     if( Process.eq.60) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
@@ -6219,13 +6223,13 @@ character :: arg*(1000)
     if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass/width are read from LHE input parameters.)"
     if( HiggsDecayLengthMM.ne.0d0 ) write(TheUnit,"(4X,A,F10.5,A)") "           Resonance ctau=", HiggsDecayLengthMM/ctauUnit, " mm"
     if( &
-         (.not.ReadLHEFile .and. (Process.le.2 .or. Process.eq.50 .or. Process.eq.60 .or. (Process.ge.66 .and. Process.le.75) .or. ((TopDecays.eq.1).and.Process.eq.80) .or. (Process.ge.110 .and. Process.le.113) .or. (Process.ge.115 .and. Process.le.116))) &
+         (.not.ReadLHEFile .and. (Process.le.12 .or. Process.eq.50 .or. Process.eq.60 .or. (Process.ge.66 .and. Process.le.75) .or. ((TopDecays.eq.1).and.Process.eq.80) .or. (Process.ge.110 .and. Process.le.113) .or. (Process.ge.115 .and. Process.le.116))) &
     .or. (ReadLHEFile .and. TauDecays.ne.0) &
     .or. ConvertLHEFile ) &
     then
         if( .not.ReadLHEFile .and. (ConvertLHEFile .or. Process.eq.50 .or. (Process.ge.110 .and. Process.le.117)) ) then
             write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1
-        else if( ReadLHEFile .or. Process.le.2 .or. Process .eq. 80 .or. (Process.ge.115 .and. Process.le.117) ) then
+        else if( ReadLHEFile .or. Process.le.12 .or. Process .eq. 80 .or. (Process.ge.115 .and. Process.le.117) ) then
             write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1, "DecayMode2:",DecayMode2
         endif
         if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.75) .or. IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z boson: mass=",M_Z/GeV,", width=",Ga_Z/GeV
@@ -6266,7 +6270,7 @@ character :: arg*(1000)
         write(TheUnit,"(11X,A,F8.2,A)") "m(gammastar) >= ", MPhotonCutoff/GeV, " GeV"
         write(TheUnit,"(F10.2,A,F10.2,A)") m4l_minmax(1)/GeV, " GeV <= m4f <= ", m4l_minmax(2)/GeV, " GeV"
     endif
-    if( (Process.eq.0 .or. Process.eq.2 .or. Process.eq.50) .and. includeGammaStar ) then
+    if( (Process.eq.0 .or. Process.eq.2 .or. Process.eq.50 .or. Process.eq.10) .and. includeGammaStar ) then
         write(TheUnit,"(6X,A,F8.2,A)") "m(gammastar) >= ", MPhotonCutoff/GeV, " GeV"
     endif
     if( ReadLHEFile ) then
@@ -6300,9 +6304,9 @@ character :: arg*(1000)
 
     if( .not. (ReadLHEFile .or. ConvertLHEFile) ) then
         write(TheUnit,"(4X,A)") ""
-        if( Process.le.2 ) write(TheUnit,"(4X,A,L,L,L)") "OffXVV: ",OffShellReson,OffShellV1,OffShellV2
+        if( Process.le.12 ) write(TheUnit,"(4X,A,L,L,L)") "OffXVV: ",OffShellReson,OffShellV1,OffShellV2
         write(TheUnit,"(4X,A,I3)") "WidthScheme: ",WidthScheme
-        if( Process.le.2 .or. Process.eq.80 .or. Process.eq.90 ) write(TheUnit,"(4X,A,I1)") "PChannel: ",PChannel
+        if( Process.le.12 .or. Process.eq.80 .or. Process.eq.90 ) write(TheUnit,"(4X,A,I1)") "PChannel: ",PChannel
 #if useLHAPDF==1
         write(TheUnit,"(4X,A,A,A,I3)") "LHAPDF set ",trim(LHAPDFString), ", member=",LHAPDFMember
 #else
@@ -6318,18 +6322,18 @@ character :: arg*(1000)
     endif
     if(Process.ge.66 .and. Process.le.75 .and. ReweightInterference) then
       write(TheUnit, "(4X,A)") "Interference: Included through event weights"
-    elseif( Process.le.2 .or. (Process.ge.66 .and. Process.le.75) .or. ReadLHEFile ) then
+    elseif( Process.le.12 .or. (Process.ge.66 .and. Process.le.75) .or. ReadLHEFile ) then
       write(TheUnit,"(4X,A,L)") "Interference: ",includeInterference
     endif
 
     if( &
-        ( (Process.le.2 .or. ReadLHEFile) .and. (IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2)) ) .or. &
+        ( (Process.le.12 .or. ReadLHEFile) .and. (IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2)) ) .or. &
         Process.eq.60 .or. (Process.ge.66 .and. Process.le.68) .or. (Process.ge.70 .and. Process.le.75)   &
       ) write(TheUnit,"(4X,A,L)") "Intermediate off-shell photons: ",includeGammaStar
     if( Process.eq.69 ) write(TheUnit,"(4X,A,L)") "Intermediate off-shell gluons: ",includeGammaStar
 
     write(TheUnit,"(4X,A)") ""
-    if( (Process.eq.0 .and. TauDecays.lt.0) .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. Process.eq.66 .or. Process.eq.68 .or. Process.eq.70 .or. Process.eq.72 .or. Process.eq.73 .or. Process.eq.75 .or. Process.eq.50 .or. (Process.eq.51 .and. VH_PC.ne."bo") ) then
+    if( ((Process.eq.0 .or. Process.eq.10) .and. (TauDecays.lt.0)) .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. Process.eq.66 .or. Process.eq.68 .or. Process.eq.70 .or. Process.eq.72 .or. Process.eq.73 .or. Process.eq.75 .or. Process.eq.50 .or. (Process.eq.51 .and. VH_PC.ne."bo") ) then
         write(TheUnit,"(4X,A)") "Spin-0-VV couplings: "
         write(TheUnit,"(6X,A,L)") "generate_as=",generate_as
         if( generate_as ) then
@@ -6784,7 +6788,7 @@ character :: arg*(1000)
             endif
         endif
     endif
-    if( (Process.eq.0 .and. TauDecays.ge.0) .or. Process.eq.80 .or. Process.eq.90 .or. (Process.eq.51 .and. VH_PC.ne."tr" .and. VH_PC.ne."ee" .and. VH_PC.ne."qq") ) then
+    if( ((Process.eq.0 .or. Process.eq.10) .and. (TauDecays.ge.0)) .or. Process.eq.80 .or. Process.eq.90 .or. (Process.eq.51 .and. VH_PC.ne."tr" .and. VH_PC.ne."ee" .and. VH_PC.ne."qq") ) then
         write(TheUnit,"(4X,A)") "spin-0-ff couplings: "
         if( cdabs(kappa ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa=",kappa,"i"
         if( cdabs(kappa_tilde ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa_tilde=",kappa_tilde,"i"
@@ -7125,6 +7129,7 @@ implicit none
         print *, "   ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,"
         print *, "                      250 GeV for e+e-"
         print *, "   Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance,"
+        print *, "                      10=phase space in decay of a resonance,"
         print *, "                      50=qq/ee->VH, 51=gg->ZH,"
         print *, "                      60=VBF, 61=pp->Hjj, 62=pp->Hj,"
         print *, "                      66=EW VVJJ sig., 67=EW VVJJ bkg., 68=EW VVJJ tot.,"
@@ -7137,18 +7142,13 @@ implicit none
         print *, "                      114=t/tbar+H t/s channels"
         print *, "                      115=t+W+H, 116=tbar+W+H"
         print *, "                      117=t/tbar+W+H"
-        print *, "   Polarization:      fL = (-1, 1) fPerp = (-1, 1)"
-        print *, "                      Polarization of spin 0 resonance." 
-        print *, "                      When calc_fL=1, fL and fPerp can be real number from -1 to 1."
-        print *, "                      When calc_fL=2, fL = 0 or 1, fPerp =0." 
-        print *, "                      Need to set with calc_fL at the same time."
-        print *, "                      calc_fL = 0, 1, 2"
-        print *, "                      calc_fAmp = -1, 1, 2, -11" 
-        print *, "                      Polarization of spin 2 resonance." 
-        print *, "                      -1 is spin 1- projection." 
-        print *, "                      1 is spin 1+ projection." 
-        print *, "                      2 is spin 2+ projection." 
-        print *, "                      -11 is interference between spin 1+ and spin 1-."
+        print *, "   Polarization:      For Process 0:"
+        print *, "                      fL = longitudinal polarization (-1, 1)," 
+        print *, "                      fPerp = CP-odd transverse polarization (-1, 1)"
+        print *, "                      calc_fL = method for modelling polarized states (1 to activate)" 
+        print *, "                      For Process 2:"
+        print *, "                      calc_fAmp = option for Jz^P of resonance "
+        print *, "                      (-1 for Jz^P = 1^-, 1 for 1^+,2 for 2^+, -11 for interference 1^+ and 1^-)" 
         print *, "   DecayMode1:        decay mode for vector boson 1 (Z/W/gamma)"
         print *, "   DecayMode2:        decay mode for vector boson 2 (Z/W/gamma)"
         print *, "                        0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->2nu,"

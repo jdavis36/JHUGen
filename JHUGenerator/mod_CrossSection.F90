@@ -49,7 +49,7 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
     endif
     EvalCounter = EvalCounter+1
 
-   if( Process.eq.0 .or. PChannel.eq.0) then
+   if( Process.eq.0 .or. PChannel.eq.0 .or. Process.eq.10) then
       NumPartonicChannels = 1
       iPart_sel = 0
       jPart_sel = 0
@@ -189,9 +189,11 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
    !print *,"Mom8: ",MomExt(1:4,8)
    !print *,"iPart, jPart: ",iPart_sel,jPart_sel
 
-   if ( PChannel.eq.0 .or.(PChannel.eq.2 .and. iPart_sel.eq.0 .and. jPart_sel.eq.0)) then
+   if ( PChannel.eq.0 .or. Process.eq.10 .or.(PChannel.eq.2 .and. iPart_sel.eq.0 .and. jPart_sel.eq.0)) then
       if (Process.eq.0) then
           call EvalAmp_gg_H_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8)/),ID_DK(6:9),LO_Res_Unpol)
+      elseif (Process.eq.10) then
+          call EvalAmp_gg_H_VV_phase( (/-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8)/),ID_DK(6:9),LO_Res_Unpol)
       elseif(Process.eq.2) then
           call EvalAmp_gg_G_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8)/),ID_DK(6:9),LO_Res_Unpol)
       endif
@@ -242,7 +244,7 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
 
 
    EvalWeighted = LO_Res_Unpol * PreFac
-   if( WidthScheme.ne.2 .and. Process.eq.0 ) EvalWeighted = EvalWeighted * ReweightBWPropagator( Get_MInv2( MomExt(1:4,3)+MomExt(1:4,4) ) )
+   if( WidthScheme.ne.2 .and. (Process.eq.0 .or. Process.eq.10) ) EvalWeighted = EvalWeighted * ReweightBWPropagator( Get_MInv2( MomExt(1:4,3)+MomExt(1:4,4) ) )
 
 
    if( unweighted ) then
