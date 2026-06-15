@@ -780,7 +780,9 @@ jobs:
             make all
       - save_cache:
           key: v1_analyzer
-          paths: ~/CMSJHU_AnalysisMacros/      - run: echo "export LHEDIR=$HOME/artifacts/VBF" >> $BASH_ENV
+          paths: ~/CMSJHU_AnalysisMacros/      
+      
+      - run: echo "export LHEDIR=$HOME/artifacts/VBF" >> $BASH_ENV
       - run: mkdir -p $LHEDIR/
       - run:
           name: "md5sum of files relevant for VBF plots"
@@ -858,7 +860,9 @@ jobs:
             make all
       - save_cache:
           key: v1_analyzer
-          paths: ~/CMSJHU_AnalysisMacros/      - run: echo "export LHEDIR=$HOME/artifacts/VBF" >> $BASH_ENV
+          paths: ~/CMSJHU_AnalysisMacros/      
+      
+      - run: echo "export LHEDIR=$HOME/artifacts/VBF" >> $BASH_ENV
       - run: mkdir -p $LHEDIR/
       - run:
           name: "md5sum of files relevant for VBF plots"
@@ -936,7 +940,9 @@ jobs:
             make all
       - save_cache:
           key: v1_analyzer
-          paths: ~/CMSJHU_AnalysisMacros/      - run: echo "export LHEDIR=$HOME/artifacts/VBF" >> $BASH_ENV
+          paths: ~/CMSJHU_AnalysisMacros/      
+          
+      - run: echo "export LHEDIR=$HOME/artifacts/VBF" >> $BASH_ENV
       - run: mkdir -p $LHEDIR/
       - run:
           name: "md5sum of files relevant for VBF plots"
@@ -1014,7 +1020,9 @@ jobs:
             make all
       - save_cache:
           key: v1_analyzer
-          paths: ~/CMSJHU_AnalysisMacros/      - run: echo "export LHEDIR=$HOME/artifacts/VBF" >> $BASH_ENV
+          paths: ~/CMSJHU_AnalysisMacros/      
+      
+      - run: echo "export LHEDIR=$HOME/artifacts/VBF" >> $BASH_ENV
       - run: mkdir -p $LHEDIR/
       - run:
           name: "md5sum of files relevant for VBF plots"
