@@ -48,7 +48,7 @@ void VBFplots(int key)
     {
         h[i] = new THStack(variables[i], variables[i]);
         hh[i] = new TH1F(TString(files[key][0]).ReplaceAll("/","") += variables[i], "h", 100, mins[i], maxes[i]);
-        hh[i]->SetLineColor(j+1);
+        hh[i]->SetLineColor(key+1);
     }
 
     TLegend *leg = new TLegend(0.6, 0.7, 0.9, 0.9);
