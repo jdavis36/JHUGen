@@ -74,7 +74,7 @@ void VBFplots(int key)
     t->SetBranchAddress("GenAssociatedParticlePhi", &phi);
 
     long length = t->GetEntries();
-    if (length == 0) continue;
+    if (length == 0) return;
     for (int l = 0; l < length; l++)
     {
         t->GetEntry(l);
