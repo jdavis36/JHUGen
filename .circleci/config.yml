@@ -822,7 +822,7 @@ jobs:
             fi
       - run:
           name: plots
-           command: |
+          command: |
              if $DOPLOTS; then
                cd ../.circleci
                root -b -q 'VBFplots.C+(0)'
@@ -902,7 +902,7 @@ jobs:
             fi
       - run:
           name: plots
-           command: |
+          command: |
              if $DOPLOTS; then
                cd ../.circleci
                root -b -q 'VBFplots.C+(2)'
@@ -982,7 +982,7 @@ jobs:
             fi
       - run:
           name: plots
-           command: |
+          command: |
              if $DOPLOTS; then
                cd ../.circleci
                root -b -q 'VBFplots.C+(1)'
@@ -1062,7 +1062,7 @@ jobs:
             fi
       - run:
           name: plots
-           command: |
+          command: |
              if $DOPLOTS; then
                cd ../.circleci
                root -b -q 'VBFplots.C+(3)'
