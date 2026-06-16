@@ -124,16 +124,16 @@ void setupfiles()
 {
     if (filesfilled) return;
 
-    files[0].push_back("$LHEDIR/VBF/SM.root");
+    files[0].push_back("$LHEDIR/VBF_SM.root");
     names[0] = "VBF SM";
 
-    files[1].push_back("$LHEDIR/VBF/PS.root");
+    files[1].push_back("$LHEDIR/VBF_PS.root");
     names[1] = "VBF PS";
 
-    files[2].push_back("$LHEDIR/VBF/a2.root");
+    files[2].push_back("$LHEDIR/VBF_a2.root");
     names[2] = "VBF a2";
 
-    files[3].push_back("$LHEDIR/HJJ/SM.root");
+    files[3].push_back("$LHEDIR/HJJ_SM.root");
     names[3] = "HJJ SM";
 
     filesfilled = true;
