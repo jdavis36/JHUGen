@@ -113,10 +113,10 @@ void VBFplots(int key)
     {
         h[i]->Draw("nostack");
         leg->Draw();
-        c1->SaveAs(TString(dir) += TString("/") += TString(variables[i]) += ".png");
-        c1->SaveAs(TString(dir) += TString("/") += TString(variables[i]) += ".eps");
-        c1->SaveAs(TString(dir) += TString("/") += TString(variables[i]) += ".root");
-        c1->SaveAs(TString(dir) += TString("/") += TString(variables[i]) += ".pdf");
+        c1->SaveAs(TString(dir) += TString(variables[i]) += ".png");
+        c1->SaveAs(TString(dir) += TString(variables[i]) += ".eps");
+        c1->SaveAs(TString(dir) += TString(variables[i]) += ".root");
+        c1->SaveAs(TString(dir) += TString(variables[i]) += ".pdf");
     }
 }
 
@@ -124,13 +124,13 @@ void setupfiles()
 {
     if (filesfilled) return;
 
-    files[0].push_back("$LHEDIR/VBF_SM.root");
+    files[0].push_back("$LHEDIR/SM.root");
     names[0] = "VBF SM";
 
-    files[1].push_back("$LHEDIR/VBF_PS.root");
+    files[1].push_back("$LHEDIR/PS.root");
     names[1] = "VBF PS";
 
-    files[2].push_back("$LHEDIR/VBF_a2.root");
+    files[2].push_back("$LHEDIR/a2.root");
     names[2] = "VBF a2";
 
     files[3].push_back("$LHEDIR/HJJ_SM.root");
