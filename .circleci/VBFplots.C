@@ -35,7 +35,7 @@ bool withptcut = false;
 
 void VBFplots(int key)
 {
-    TString dir = "$LHEDIR/VBF/";
+    TString dir = "$LHEDIR/";
     if (withptcut) dir += "/withptcut";
 
     setupfiles();
