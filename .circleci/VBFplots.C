@@ -113,10 +113,10 @@ void VBFplots(int key)
     {
         h[i]->Draw("nostack");
         leg->Draw();
-        c1->SaveAs(TString(dir) += TString(variables[i]) += "_" += TString(names[key]) += ".png");
-        c1->SaveAs(TString(dir) += TString(variables[i]) += "_" += TString(names[key]) += ".eps");
-        c1->SaveAs(TString(dir) += TString(variables[i]) += "_" += TString(names[key]) += ".root");
-        c1->SaveAs(TString(dir) += TString(variables[i]) += "_" += TString(names[key]) += ".pdf");
+        c1->SaveAs(TString(dir) += TString(variables[i]) += TString(names[key]) += ".png");
+        c1->SaveAs(TString(dir) += TString(variables[i]) += TString(names[key]) += ".eps");
+        c1->SaveAs(TString(dir) += TString(variables[i]) += TString(names[key]) += ".root");
+        c1->SaveAs(TString(dir) += TString(variables[i]) += TString(names[key]) += ".pdf");
     }
 }
 
